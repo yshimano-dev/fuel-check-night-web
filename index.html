@@ -79,8 +79,10 @@
   <div id="inputsC" class="input-grid"></div>
   <div class="source-block source-d"><span class="field-symbol">D</span><div><h3>荷卸し後の実在庫</h3><p>荷卸し後の油面計レシート「在庫量（L）」</p></div></div>
   <div id="inputsD" class="input-grid"></div>
-  <div class="source-block source-q"><span class="field-symbol">④</span><div><h3>今回入荷数量</h3><p>POSタンク管理表の「当日入荷（L）」。入荷がなければ0を入力</p></div></div>
+  <div class="source-block source-q"><span class="field-symbol">④</span><div><h3>今回入荷数量（L）</h3><p>ローリーの納品伝票で数量を確認 → 荷卸し後POSの「当日入荷（L）」と照合</p></div></div>
+  <div class="role-note"><strong>④に入力する数字：</strong>今回、<strong>各タンクへ実際に入荷した数量</strong>です。ローリーから受け取った納品伝票の油種・数量と、荷卸し後のPOS「タンク管理表」の<strong>当日入荷（L）</strong>欄を見比べ、一致した数字を入力します。<strong>入荷なしは0L</strong>。同じ油種のタンクが複数ある場合は、油種の合計ではなく<strong>タンクごとの数量</strong>を確認してください。</div>
   <div id="inputsQ" class="input-grid"></div>
+  <p class="caption">例：2026年10月24日の帳票では、H：4,000L／R：16,000L／D：4,000L／K：0L。納品伝票とPOSの数量が一致しない場合は、自己判断で転記せず担当者に確認します。</p>
   <p class="caption">実際のレシートでは灯油が4行目でも、伊都店の紙チェック表では10番Kです。店舗設定のタンクNo.を確認してください。</p>
  </section>
 

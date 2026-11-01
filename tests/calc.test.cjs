@@ -58,3 +58,17 @@ test('numeric keypad pasted data',()=>{
  assert.equal(cleanDigits('７,８３０.０'),'7830');assert.equal(cleanDigits('24,479'),'24479');assert.equal(cleanDigits('0'),'0');
  assert.equal(cleanDigits('123.5'),null);
 });
+
+test('伊都店はカード選択2番が初期設定、過去保存データも補完',()=>{
+ const def=ito();
+ assert.equal(def.posCardNo,'2');
+ assert.match(def.posCardName,/入庫/);
+ const old=sanitizeStore({id:'ito',name:'DDセルフ伊都店',pos:'ENERIS',tanks:def.tanks});
+ assert.equal(old.posCardNo,'2');
+ assert.equal(old.posCardName,def.posCardName);
+});
+test('別店舗はカード番号を勝手に2番に設定しない',()=>{
+ const x=sanitizeStore({id:'other-store',name:'他店',pos:'ENERIS',tanks:[{no:1,capacity:'20KL',oil:'R'}]});
+ assert.equal(x.posCardNo,'');
+ assert.equal(x.posCardName,'');
+});

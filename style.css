@@ -22,3 +22,38 @@ main{max-width:860px;margin:auto;padding:12px 10px 95px}.card{background:white;b
 footer{text-align:center;color:#6c8190;margin:23px 0;font-size:12px}.bottom{position:fixed;bottom:0;left:0;right:0;display:flex;gap:8px;background:white;border-top:1px solid #d2e2eb;padding:8px 11px calc(8px + env(safe-area-inset-bottom));z-index:20}.bottom button{flex:1;background:#eef6fa;border:1px solid #acc6d8;border-radius:9px;padding:10px;color:#17557b;font-weight:800}.bottom button:last-child{background:#12608b;color:white;border-color:#12608b}
 @media(min-width:650px){.input-grid{grid-template-columns:repeat(2,1fr)}.results{grid-template-columns:1fr 1fr}}
 @media(max-width:460px){.store-bar{grid-template-columns:1fr auto}.store-bar button{font-size:12px}.tank-setting{grid-template-columns:45px 63px 1fr 63px 63px 30px;gap:3px}.tank-setting input,.tank-setting select{font-size:11px;padding:3px}.field-labels{grid-template-columns:45px 63px 1fr 63px 63px 30px;gap:3px;font-size:9px}.tank-setting .delete{font-size:12px}.fuel-input{grid-template-columns:1fr 133px}.fuel-input input{font-size:22px}.step{padding:13px}.step-heading h2{font-size:17px}}
+
+/* One-screen store-specific flow directly under the store picker. */
+.quick-flow{border-top:4px solid #256d9f}
+.quick-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:11px}
+.quick-head h2{font-size:17px;margin:0;color:#153d5c}
+.quick-head p{font-size:12px;color:#667f92;margin:3px 0 0}
+.quick-tag{font-size:11px;font-weight:800;white-space:nowrap;padding:5px 9px;border-radius:6px;background:#e6f1fa;color:#245c7e}
+.quick-urgent{border-left:4px solid #e65c3a;background:#fff2eb;border-radius:7px;padding:9px 10px;font-weight:800;font-size:13px;color:#973d29;margin-bottom:12px}
+.quick-flow-path{padding-bottom:7px}
+.quick-flow-path h3{font-size:14px;margin:8px 0 5px;color:#2c5977}
+.quick-flow .path{padding:1px 0 4px;gap:5px}
+.quick-flow .path .click{text-decoration:none;display:inline-flex;align-items:center;border-radius:7px;padding:7px 8px;font-size:12px;line-height:1.35}
+.quick-flow .path .click.emphasized{background:#e5f3e7;color:#145c42;border-color:#74bb91;font-weight:900}
+.quick-flow .path .arrow{font-size:14px}
+.quick-code{background:#eef6fc;border:1px solid #b4d0e3;border-radius:9px;padding:11px;margin:9px 0}
+.quick-code-head{display:flex;align-items:center;gap:9px;justify-content:space-between}
+.quick-code-head strong{font-size:17px;color:#145374}
+.quick-code-head span{color:#9a3d2b}
+.quick-code-head button{font-size:12px;padding:7px 9px}
+.quick-code #quickCodeEditor{margin-top:10px;border-top:1px solid #c4d9e5;padding-top:12px}
+.quick-code #quickCodeEditor[hidden]{display:none}
+.quick-code #quickCodeEditor label,.pos-setup label{display:block;font-weight:800;font-size:13px;margin-bottom:5px}
+.quick-code .staff-code-controls{display:flex;gap:8px;align-items:center}
+.quick-code .staff-code-controls input{flex:1;font-size:20px;font-weight:800;text-align:right;height:47px;border:1px solid #90b5cb;border-radius:8px;padding:7px 10px}
+.quick-detail-link{display:block;font-weight:700;color:#12638c;font-size:12px;text-decoration:underline;margin-top:8px}
+.pos-setup{border:1px solid #c6dce9;border-radius:9px;padding:10px 12px;margin:12px 0}
+.pos-setup legend{font-weight:800;font-size:14px;color:#235e80}
+.pos-setup input{display:block;width:100%;border-radius:8px;border:1px solid #aac1d3;padding:9px;margin:0 0 10px;height:42px;font-size:15px}
+.pos-selection-hint{border-radius:8px;background:#eef9f1;padding:12px;margin:12px 0;color:#155c39;font-weight:800}
+.pos-selection-hint.needs-config{background:#fff1dc;color:#9c5c19}
+.staff-code-card{border:1px solid #bad3e2;border-radius:9px;padding:12px;background:#f7fbfe;margin:12px 0}
+.staff-code-card label{font-weight:800;display:block;font-size:13px;margin-bottom:7px}
+.staff-code-controls{display:flex;gap:8px}
+.staff-code-card input{height:46px;font-size:19px;font-weight:800;flex:1;min-width:0;border:1px solid #aac1d1;border-radius:8px;padding:8px}
+.staff-code-card input[readonly]{background:#f2f6f9}

@@ -1,10 +1,11 @@
 'use strict';
 const STORAGE='fuel-check-workflow-v1';
+const STAFF_LOCAL_KEY='fuel-check-local-staff-v1';
 const FUELS=[['H','H｜ハイオク'],['R','R｜レギュラー'],['D','D｜軽油'],['K','K｜灯油'],['OTHER','その他／廃油など']];
 const DEFAULT_CHECKS={preReceipt:false,prePos:false,unloading:false,postReceipt:false,posEntered:false,postPos:false,paperSaved:false};
 const FIELDS=['A','B','C','D','Q'];
 function fuelLimit(oil){return oil==='K'?{liters:100,percent:2.5}:['H','R','D'].includes(oil)?{liters:400,percent:2.5}:null;}
-function ito(){return {id:'ito',name:'DDセルフ伊都店',pos:'ENERIS',tanks:[
+function ito(){return {id:'ito',name:'DDセルフ伊都店',pos:'ENERIS',posCardName:'入庫（JX日光）',posCardNo:'2',tanks:[
  {no:1,capacity:'14KL',oil:'H'}, {no:2,capacity:'48KL',oil:'R'},
  {no:3,capacity:'14KL',oil:'D'}, {no:10,capacity:'20KL',oil:'K'}
 ]};}
@@ -37,6 +38,11 @@ function sanitizeStore(st){
  if(!st||typeof st!=='object')return null;
  const name=String(st.name||'店舗').trim().slice(0,40)||'店舗';
  const pos=st.pos==='POS21'?'POS21':'ENERIS';
+ const nameDefault=st.id==='ito'&&st.posCardName===undefined?'入庫（JX日光）':'';
+ const noDefault=st.id==='ito'&&st.posCardNo===undefined?'2':'';
+ const posCardName=String(st.posCardName??nameDefault).trim().slice(0,70);
+ const candidate=String(st.posCardNo??noDefault).trim();
+ const posCardNo=/^\d{1,5}$/.test(candidate)?candidate:'';
  const list=Array.isArray(st.tanks)?st.tanks:[];
  if(list.length<1||list.length>20)return null;
  const tanks=[],ids=new Set();
@@ -53,7 +59,7 @@ function sanitizeStore(st){
   tanks.push(t);
  }
  tanks.sort((a,b)=>a.no-b.no);
- return {id:String(st.id||'s'+Date.now()),name,pos,tanks};
+ return {id:String(st.id||'s'+Date.now()),name,pos,posCardName,posCardNo,tanks};
 }
 function blankSession(){return {values:{},checks:{...DEFAULT_CHECKS},createdAt:Date.now()};}
 let state={stores:[ito()],active:'ito',sessions:{ito:blankSession()}};
@@ -76,7 +82,8 @@ function activeStore(){return state.stores.find(x=>x.id===state.active)||state.s
 function session(){if(!state.sessions[state.active])state.sessions[state.active]=blankSession();return state.sessions[state.active];}
 function getEntry(t){const key=String(t.no);const s=session();if(!s.values[key])s.values[key]={A:'',B:'',C:'',D:'',Q:''};return s.values[key];}
 function encodedStore(st){
- const text=JSON.stringify({name:st.name,pos:st.pos,tanks:st.tanks});
+ // Only non-secret display information is shared. Staff codes never enter URLs.
+ const text=JSON.stringify({name:st.name,pos:st.pos,posCardName:st.posCardName,posCardNo:st.posCardNo,tanks:st.tanks});
  return btoa(unescape(encodeURIComponent(text))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 function applySharedStore(){
@@ -111,6 +118,8 @@ function renderStoreSelect(){
  sel.value=state.active;
  el('storeName').value=activeStore().name;
  el('posType').value=activeStore().pos;
+ el('posCardName').value=activeStore().posCardName||'';
+ el('posCardNo').value=activeStore().posCardNo||'';
 }
 function updateStore(mut){
  mut(activeStore());
@@ -142,19 +151,126 @@ function renderTankSettings(){
   del.addEventListener('click',()=>{if(!confirm('タンクNo.'+tank.no+'を削除しますか？'))return;updateStore(st=>{st.tanks=st.tanks.filter(t=>t.no!==tank.no);});});r.append(del);root.append(r);
  }
 }
+function readStaffCode(storeId){
+ try{
+  const all=JSON.parse(localStorage.getItem(STAFF_LOCAL_KEY)||'{}');
+  const value=all?.[storeId];
+  return typeof value==='string'&&/^\d{1,12}$/.test(value)?value:'';
+ }catch(e){return ''}
+}
+function writeStaffCode(storeId,raw){
+ const code=cleanDigits(raw);
+ if(code===null||(!/^\d{1,12}$/.test(code)&&code!==''))return false;
+ try{
+  const all=JSON.parse(localStorage.getItem(STAFF_LOCAL_KEY)||'{}');
+  if(code)all[storeId]=code;else delete all[storeId];
+  localStorage.setItem(STAFF_LOCAL_KEY,JSON.stringify(all));
+  return true;
+ }catch(e){return false}
+}
+function flowRow(id,heading,items){
+ const root=el(id);root.replaceChildren();
+ root.append(make('h3','',heading));
+ const path=make('div','path');
+ items.forEach((item,i)=>{
+  if(i)path.append(make('span','arrow','→'));
+  const chip=make('a','click'+(item.important?' emphasized':''),item.label);
+  chip.href=item.href;
+  if(item.href==='#quickCodeEditor')chip.addEventListener('click',e=>{e.preventDefault();openQuickCodeEditor();});
+  path.append(chip);
+ });
+ root.append(path);
+}
+function openQuickCodeEditor(){
+ const editor=el('quickCodeEditor');
+ editor.hidden=false;
+ el('quickCodeInput').value=readStaffCode(activeStore().id);
+ editor.scrollIntoView({behavior:'smooth',block:'center'});
+ el('quickCodeInput').focus({preventScroll:true});
+}
+function saveQuickCode(){
+ const st=activeStore(),raw=el('quickCodeInput').value;
+ if(raw.trim()&&!/^\d{1,12}$/.test(raw.trim())){
+  alert('担当者コードは12桁以内の数字で入力してください。');
+  return;
+ }
+ if(!writeStaffCode(st.id,raw.trim())){
+  alert('この端末に保存できませんでした。Safariの保存設定を確認してください。');
+  return;
+ }
+ el('quickCodeEditor').hidden=true;
+ renderPos();renderQuickFlow();
+}
+function renderQuickFlow(){
+ const st=activeStore(),pos=st.pos,code=readStaffCode(st.id);
+ el('quickStoreName').textContent=st.name;
+ el('quickPosType').textContent=(pos==='ENERIS'?'ENERIS-POS':'POS21')+' ／ POS操作フローと入庫の順番';
+ flowRow('quickBefore','① 受け入れ前',[
+  {label:'到着したらレシート印字',href:'#step1',important:true},
+  {label:'前POS タンク管理表',href:'#step2'},
+  {label:'A・Bの数字入力',href:'#step3'}
+ ]);
+ if(pos==='ENERIS'){
+  const name=st.posCardName||'カード名称未設定';
+  const no=st.posCardNo?st.posCardNo+'番を選択':'選択番号未設定';
+  flowRow('quickAfter','② 受け入れ後',[
+   {label:'レシート再印字',href:'#step5',important:true},
+   {label:'POS → 入庫',href:'#step6'},
+   {label:'転受カード一覧',href:'#step6'},
+   {label:'カード名称 '+name,href:'#step6'},
+   {label:no,href:'#step6',important:true},
+   {label:'店受けカード一覧',href:'#step6'},
+   {label:'担当者コード '+(code||'未登録'),href:'#quickCodeEditor',important:true},
+   {label:'油種・数量 → 後POS印刷',href:'#step6'},
+   {label:'C・D・④入力 → 判定',href:'#step7'}
+  ]);
+ }else{
+  flowRow('quickAfter','② 受け入れ後',[
+   {label:'レシート再印字',href:'#step5',important:true},
+   {label:'POS21 → 仕入',href:'#step6'},
+   {label:'油種・タンクNo.・数量',href:'#step6'},
+   {label:'担当者コード '+(code||'未登録'),href:'#quickCodeEditor'},
+   {label:'後POS印刷 → C・D・④入力',href:'#step7'},
+   {label:'判定',href:'#step8'}
+  ]);
+ }
+ el('quickCodeValue').textContent=code||'未登録（初回のみ設定）';
+ const edit=el('quickCodeEditor');edit.hidden=true;
+ el('quickCodeInput').value=code;
+ const field=el('staffCode');
+ if(field){field.value=code;field.type='text';field.readOnly=true;}
+ const toggle=el('toggleStaffCode');if(toggle)toggle.textContent='変更';
+}
 function renderPos(){
- const pos=activeStore().pos;
+ const store=activeStore(),pos=store.pos;
+ const chosenName=store.posCardName||'未設定（店舗設定で登録）';
+ const chosenNo=store.posCardNo?store.posCardNo+'番':'未設定（店舗設定で登録）';
  const pre=pos==='ENERIS'?['メインメニュー','点検','SS営業日報管理','タンク管理表','当日分','印刷']:
  ['メインメニュー','点検／問合せ','タンク管理','印刷','レシート出力'];
- const post=pos==='ENERIS'?['メインメニュー','通常','入出荷業務','入庫','転受カード一覧','カード名称：入庫','担当者コード','商品パネル','油種選択','タンクNo.','数量','単価は削除・金額は未入力']:
- ['メインメニュー','伝票入力','仕入','仕入先選択','エネオス','確定（2回）','油種選択','タンクNo.・数量'];
+ const post=pos==='ENERIS'?[
+ 'メインメニュー','通常','入出荷業務','入庫','転受カード一覧',
+ 'カード名称：'+chosenName,'一覧の選択番号：'+chosenNo,
+ '店受けカード一覧','担当者コード：'+(readStaffCode(store.id)||'未登録（上部の店舗フローで設定）'),'商品パネル','油種選択','タンクNo.','数量','単価は削除・金額は未入力'
+ ]:[
+ 'メインメニュー','伝票入力','仕入','仕入先選択（店舗の設定を確認）',
+ 'エネオス','確定（2回）','油種選択','タンクNo.・数量'
+ ];
  el('prePosTitle').textContent=pos==='ENERIS'?'ENERIS-POS：荷卸し前のタンク管理表':'POS21：荷卸し前のタンク管理表';
  renderPath('prePosPath',pre);
  renderPath('postPosPath',post);
  renderPath('postReportPath',pre);
+ const hint=el('posSelectionHint');
+ hint.textContent=pos==='ENERIS'?
+ ('この店舗で選ぶカード：'+chosenName+'／選択番号：'+chosenNo+
+  '。担当者コードは下欄に入力（共有リンクには含まれません）。'):
+ 'POS21用の操作案内です。カード選択や担当者コードは店舗の正式設定を確認してください。';
+ hint.classList.toggle('needs-config',pos==='ENERIS'&&(!store.posCardName||!store.posCardNo));
  el('posNote').textContent=pos==='ENERIS'?
- 'ENEOSの2026年10月15日版マニュアル16〜21ページの画面順を参考にしています。担当者コードは店舗で確認。複数油種は「商品パネル」から繰り返します。':
+ 'ENEOSの2026年10月15日版マニュアル16〜21ページの画面順を参考にしています。入庫カードの名称・番号は店舗ごとに異なるため、事前に店舗設定で登録してください。複数油種は「商品パネル」から繰り返します。':
  'ENEOSの2026年10月15日版マニュアル4〜9ページの画面順を参考にしています。スタッフコードの入力や仕入先の選択は店舗の正式な手順を確認してください。';
+ const code=el('staffCode');
+ if(code){code.value=readStaffCode(store.id);code.type='text';code.readOnly=true;}
+ const toggle=el('toggleStaffCode');if(toggle)toggle.textContent='変更';
 }
 function renderPath(id,steps){
  const root=el(id);root.replaceChildren();
@@ -259,7 +375,7 @@ function renderChecks(){
  for(const inp of document.querySelectorAll('[data-check]'))inp.checked=Boolean(session().checks[inp.dataset.check]);
 }
 function renderAll(){
- renderStoreSelect();renderTankSettings();renderPos();renderInputFields();renderChecks();renderResults();updateProgress();
+ renderStoreSelect();renderTankSettings();renderPos();renderQuickFlow();renderInputFields();renderChecks();renderResults();updateProgress();
 }
 function startNewJob(){
  if(!confirm('この店舗の入力数字とチェックを消去して、新しい荷卸しを始めますか？'))return;
@@ -278,7 +394,7 @@ function addTank(){
 function deleteStore(){
  if(state.stores.length===1){alert('最後の1店舗は削除できません');return;}
  if(!confirm('「'+activeStore().name+'」と、その店舗の保存した数字を削除しますか？'))return;
- const id=state.active;state.stores=state.stores.filter(x=>x.id!==id);delete state.sessions[id];
+ const id=state.active;writeStaffCode(id,'');state.stores=state.stores.filter(x=>x.id!==id);delete state.sessions[id];
  state.active=state.stores[0].id;save();renderAll();
 }
 async function copyStoreLink(){
@@ -299,6 +415,19 @@ function init(){
  });
  el('storeName').addEventListener('change',e=>updateStore(st=>{st.name=e.target.value.trim()||st.name;}));
  el('posType').addEventListener('change',e=>updateStore(st=>{st.pos=e.target.value;}));
+ el('posCardName').addEventListener('change',e=>updateStore(st=>{st.posCardName=e.target.value.trim();}));
+ el('posCardNo').addEventListener('change',e=>{
+  const next=e.target.value.trim();
+  if(next&&!/^\d{1,5}$/.test(next)){alert('カード番号は5桁以内の数字で入力してください。');renderStoreSelect();return;}
+  updateStore(st=>{st.posCardNo=next;});
+ });
+ el('quickEditCode').addEventListener('click',()=>{
+  if(el('quickCodeEditor').hidden)openQuickCodeEditor();
+  else el('quickCodeEditor').hidden=true;
+ });
+ el('quickSaveCode').addEventListener('click',saveQuickCode);
+ el('quickCodeInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveQuickCode();}});
+ el('toggleStaffCode').addEventListener('click',openQuickCodeEditor);
  el('addStore').addEventListener('click',promptStore);
  el('addTank').addEventListener('click',addTank);
  el('deleteStore').addEventListener('click',deleteStore);

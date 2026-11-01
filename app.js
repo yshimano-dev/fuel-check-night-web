@@ -369,6 +369,9 @@ function renderResults(){
  }
  const text=hasBad?'×　数値が許容範囲外です':hasNoLimit?'基準未設定の油種があります':all?'数値判定：すべて許容範囲内':'数字の入力・確認が未完了です';
  const out=el('overall');out.textContent=text;out.className='overall '+(hasBad?'bad':all?'good':'pending');
+ const count=tanks.reduce((sum,t)=>sum+FIELDS.filter(f=>getEntry(t)[f]!=='').length,0);
+ const transfer=el('transferStatus');
+ if(transfer)transfer.textContent='入力済み '+count+'／'+(tanks.length*5)+'項目　｜　'+(count?'表の数字を紙へ転記できます。未入力は「—」です。':'入力数字はありません。入力後に自動表示されます。');
  const tb=el('paperBody');tb.replaceChildren();
  const map=new Map(tanks.map(t=>[t.no,t]));
  const max=Math.min(30,Math.max(10,...tanks.map(t=>t.no)));
@@ -403,6 +406,12 @@ function renderChecks(){
 }
 function renderAll(){
  renderStoreSelect();renderTankSettings();renderPos();renderQuickFlow();renderInputFields();renderChecks();renderResults();updateProgress();
+}
+function clearActiveJob(){
+ if(!confirm('この店舗の入力数字・計算結果・進行チェックをすべてクリアします。店舗とタンク設定は残します。よろしいですか？'))return;
+ state.sessions[state.active]=blankSession();
+ save();renderAll();
+ const transfer=el('transferWrap');if(transfer){transfer.scrollLeft=0;transfer.scrollTop=0;}
 }
 function startNewJob(){
  if(!confirm('この店舗の入力数字とチェックを消去して、新しい荷卸しを始めますか？'))return;
@@ -467,8 +476,10 @@ function init(){
  el('deleteStore').addEventListener('click',deleteStore);
  el('copyStoreLink').addEventListener('click',copyStoreLink);
  el('newJob').addEventListener('click',startNewJob);
+ el('clearDigits').addEventListener('click',clearActiveJob);
  el('goTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
  el('goResult').addEventListener('click',()=>el('step8').scrollIntoView({behavior:'smooth'}));
+ el('goPaper').addEventListener('click',()=>el('step9').scrollIntoView({behavior:'smooth'}));
  for(const c of document.querySelectorAll('[data-check]')){
   c.addEventListener('change',()=>{
    session().checks[c.dataset.check]=c.checked;save();updateProgress();

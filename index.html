@@ -12,6 +12,7 @@
  </section>
  <section class="card quick-flow" id="storeQuickFlow" aria-label="選択店舗の操作フローチャート">
   <div class="quick-head"><div><h2 id="quickStoreName">店舗の作業フロー</h2><p id="quickPosType">店舗を選んでください</p></div><span class="quick-tag">この店舗用</span></div>
+  <div class="quick-visual-actions"><button type="button" class="visual-btn" data-visual="receipt">▣ レシート印字｜映像で確認</button><button type="button" class="visual-btn" data-visual="pos-before">▣ POS操作｜映像で確認</button></div>
   <div class="quick-urgent">最優先：ローリー到着直後に油面計の在庫レシートを印字。受け入れ終了後にもう一度印字。</div>
   <div id="quickBefore" class="quick-flow-path"></div>
   <div id="quickAfter" class="quick-flow-path"></div>
@@ -69,13 +70,13 @@
  <div id="progressLine" class="progress-line"></div>
 
  <section class="step card" id="step1">
-  <div class="step-heading"><span class="count urgent-num">1</span><div><h2>ローリー到着直後</h2><p>最初に行うこと</p></div></div>
+  <div class="step-heading"><span class="count urgent-num">1</span><div><h2>ローリー到着直後</h2><p>最初に行うこと</p></div><button type="button" class="visual-btn" data-visual="receipt">映像で確認</button></div>
   <div class="important">油面計の <strong>［印刷］→［レシート印字］</strong> を押す。荷卸し前の在庫レシートを取ります。</div>
   <label class="check"><input type="checkbox" data-check="preReceipt">荷卸し前のレシートを印字した</label>
  </section>
 
  <section class="step card" id="step2">
-  <div class="step-heading"><span class="count">2</span><div><h2>荷卸し前のPOS帳票を印刷</h2><p>荷卸し前の計算在庫を確認</p></div></div>
+  <div class="step-heading"><span class="count">2</span><div><h2>荷卸し前のPOS帳票を印刷</h2><p>荷卸し前の計算在庫を確認</p></div><button type="button" class="visual-btn" data-visual="pos-before">映像で確認</button></div>
   <div class="role-note">POS操作は店舗で操作権限のある担当者が行ってください。夜勤スタッフが操作できない場合は、担当者から帳票を受け取ります。</div>
   <h3 id="prePosTitle">POS操作順</h3>
   <div id="prePosPath" class="path"></div>
@@ -97,13 +98,13 @@
  </section>
 
  <section class="step card" id="step5">
-  <div class="step-heading"><span class="count urgent-num">5</span><div><h2>受け入れ完了後、再びレシート印字</h2><p>ここでも印刷を優先</p></div></div>
+  <div class="step-heading"><span class="count urgent-num">5</span><div><h2>受け入れ完了後、再びレシート印字</h2><p>ここでも印刷を優先</p></div><button type="button" class="visual-btn" data-visual="receipt">映像で確認</button></div>
   <div class="important">油面計の <strong>［印刷］→［レシート印字］</strong> をもう一度押し、荷卸し後の在庫レシートを取ります。</div>
   <label class="check"><input type="checkbox" data-check="postReceipt">荷卸し後の在庫レシートを印字した</label>
  </section>
 
  <section class="step card" id="step6">
-  <div class="step-heading"><span class="count">6</span><div><h2>POS入庫処理・荷卸し後の帳票</h2><p>POSで入庫数量を記録し、その後の帳票を出力</p></div></div>
+  <div class="step-heading"><span class="count">6</span><div><h2>POS入庫処理・荷卸し後の帳票</h2><p>POSで入庫数量を記録し、その後の帳票を出力</p></div><button type="button" class="visual-btn" data-visual="pos-inbound">映像で確認</button></div>
   <div class="role-note">POSの入庫入力は権限のある担当者が実施。操作内容・数量・油種を元の配送伝票と照合してください。</div>
   <h3>入庫（仕入）の操作順</h3>
   <div id="postPosPath" class="path"></div>
@@ -138,22 +139,41 @@
   <div id="overall" class="overall neutral" role="status" aria-live="polite">数字の入力待ち</div>
   <p class="caption">数値判定は「販売・荷卸しの最終許可」ではありません。コンタミの疑い、帳票の不一致、上長確認事項は正式な判断フローを優先してください。</p>
   <div id="results" class="results"></div>
-  <details class="paper-detail"><summary>紙のチェック表と同じ横並びを確認</summary>
-   <div class="table-wrap"><table class="paper"><thead><tr><th>タンクNo.</th><th>容量</th><th>油種</th><th>A</th><th>B</th><th>① B−A</th><th>C</th><th>D</th><th>② D−C</th><th>③ ②−①</th><th>率</th><th>許容</th><th>判定</th><th>④</th></tr></thead><tbody id="paperBody"></tbody></table></div>
-  </details>
+  <p class="caption">正式な紙への転記用の表は、次の「9. 紙へ転記」にあります。タンク番号・見出しを固定したまま数字を確認できます。</p>
   <div class="warn">「×」「要入力」「基準未設定」があれば未完了です。数値が○でも、運転手への確認終了は店舗の他の必要な確認が終わってからにしてください。</div>
  </section>
 
  <section class="step card" id="step9">
   <div class="step-heading"><span class="count">9</span><div><h2>紙に転記・3枚1セットで保存</h2><p>正式記録として保管</p></div></div>
-  <p>計算結果を印刷済みの<strong>荷卸し検証チェック表</strong>へ手書きし、荷卸し前・後のタンク管理表＋レシートと合わせて<strong>3枚1セット</strong>で保存します。</p>
-  <p class="caption">紙への転記を運転手の出発後に行ってよいかは、各店舗の責任者の運用指示を優先してください。</p>
+  <p>下の表を見ながら、正式な<strong>荷卸し検証チェック表</strong>へ手書きします。前後のタンク管理表＋レシートと合わせて<strong>3枚1セット</strong>で保存します。</p>
+  <div class="transfer-toolbar"><strong>紙に書き写す数字一覧</strong><span>左右にスワイプして確認</span></div>
+  <div class="transfer-status" id="transferStatus">入力した数字と計算結果をここに表示します。</div>
+  <div class="table-wrap" id="transferWrap" tabindex="0" aria-label="横スクロール可能な荷卸し検証チェック表">
+   <table class="paper" aria-label="実際の紙と同じ並びの計算結果">
+    <colgroup><col class="col-no"><col class="col-cap"><col class="col-oil"><col span="11"></colgroup>
+    <thead>
+     <tr><th class="sticky-identity" rowspan="3">タンク<br>No.</th><th class="sticky-identity" rowspan="3">タンク<br>容量</th><th class="sticky-identity" rowspan="3">油種</th><th colspan="3">荷卸し前（L）</th><th colspan="3">荷卸し後（L）</th><th rowspan="3">誤差数量<br>③</th><th rowspan="3">誤差率<br>③÷④</th><th rowspan="3">許容範囲</th><th rowspan="3">判定</th><th rowspan="3">今回入荷数量<br>④</th></tr>
+     <tr><th colspan="3">前尺誤差</th><th colspan="3">後尺誤差</th></tr>
+     <tr><th class="a-h">計算在庫<br>A</th><th class="b-h">実在庫<br>B</th><th>誤差<br>B−A＝①</th><th class="c-h">計算在庫<br>C</th><th class="d-h">実在庫<br>D</th><th>誤差<br>D−C＝②</th></tr>
+    </thead>
+    <tbody id="paperBody"></tbody>
+   </table>
+  </div>
+  <div class="transfer-actions"><button type="button" class="outline danger" id="clearDigits">入力数字をクリア</button><span class="caption">クリアすると、この店舗の数字・計算結果・チェックが消えます。店舗設定は残ります。</span></div>
+  <p class="caption">タンク番号・見出しは固定。紙への転記を運転手の出発後に行ってよいかは、各店舗の責任者の運用指示を優先してください。</p>
   <label class="check"><input type="checkbox" data-check="paperSaved">紙への転記・3枚保存まで済んだ</label>
  </section>
 
  <footer><small>非公式の業務補助ツールです。入力した数字と店舗設定はこの端末のブラウザに保存され、写真や数字を外部AIへ送信しません。</small></footer>
 </main>
+<dialog id="visualDialog" class="visual-dialog" aria-labelledby="visualTitle">
+ <div class="visual-dialog-head"><h2 id="visualTitle">映像で確認</h2><button type="button" id="visualClose">閉じる ×</button></div>
+ <p class="caption">以前のENEOS操作マニュアルをもとにした画面の再現図です。動画や原本のスクリーンショットではありません。実際の画面表示と異なる場合は店舗の正式な手順を優先してください。</p>
+ <div id="visualBody"></div>
+</dialog>
 <div class="bottom">
- <button type="button" id="goTop">最初へ</button><button type="button" id="goResult">判定を見る</button>
+ <button type="button" id="goTop">最初へ</button><button type="button" id="goResult">判定</button><button type="button" id="goPaper">紙へ転記</button>
 </div>
-<script src="./app.js?v=20261102-workflow"></script></body></html>
+<script src="./app.js?v=20261102-guide"></script>
+<script src="./visual-guide.js?v=20261102-guide"></script>
+</body></html>

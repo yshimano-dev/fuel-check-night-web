@@ -72,3 +72,63 @@ footer{text-align:center;color:#6c8190;margin:23px 0;font-size:12px}.bottom{posi
 .quick-edit-actions{display:flex;gap:8px;margin-top:11px}
 .quick-edit-actions button{flex:1;min-width:0}
 .quick-edit-actions .quick-save{background:#17618a;color:white;border-color:#17618a}
+
+/* Compact illustrated help buttons - tap only when staff need a visual cue. */
+.step-heading{min-width:0}.step-heading>div{flex:1;min-width:0}
+.visual-btn{background:#f2f8fc;border:1px solid #b6cfdf;color:#1d5a7c;border-radius:7px;padding:6px 9px;font-size:11px;line-height:1.3;font-weight:800;white-space:nowrap;flex-shrink:0}
+.quick-visual-actions{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 11px}
+.quick-visual-actions .visual-btn{font-size:12px}
+.visual-dialog{box-sizing:border-box;border:0;border-radius:15px;padding:14px;background:#fff;color:#15384e;width:min(94vw,660px);max-height:88dvh;overflow:auto;box-shadow:0 15px 80px #051d304d}
+.visual-dialog::backdrop{background:#051b3299}
+.visual-dialog-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-bottom:9px;border-bottom:1px solid #d4e3ec}
+.visual-dialog-head h2{font-size:18px;margin:0}
+.visual-dialog-head button{border:1px solid #bdd2e1;background:#eaf4fb;color:#165678;border-radius:8px;padding:9px 11px;font-weight:800}
+.visual-step{background:#f6f9fc;border:1px solid #d4e4ed;border-radius:10px;padding:10px;margin:13px 0}
+.visual-step strong{font-size:15px;display:block;color:#204d71;margin-bottom:9px}
+.visual-step p{font-size:13px;color:#526c7f;margin:10px 2px 2px}
+.mock-screen{border:2px solid #254b84;border-radius:7px;background:#e0e9fd;overflow:hidden}
+.mock-top{background:#244681;color:#fff;display:flex;justify-content:space-between;gap:12px;font-size:12px;padding:9px 10px;font-weight:800}
+.mock-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:12px}
+.screen-chip{border:1px solid #b4c8e1;background:#fff;color:#1c436d;border-radius:6px;padding:8px 5px;display:flex;justify-content:center;align-items:center;text-align:center;min-height:37px;font-size:12px;font-weight:800;overflow-wrap:anywhere}
+.screen-chip.on{background:#ffe5ad;border:3px solid #d24e21;color:#80300b}
+.mock-gauge{border:2px solid #7894a5;border-radius:7px;background:#e6edf1;padding:8px}
+.mock-gauge-bar{background:#324e61;color:#fff;padding:9px 11px;margin-bottom:8px}
+.mock-buttons{display:flex;gap:7px;flex-wrap:wrap}
+.mock-output{display:flex;gap:7px;margin:8px 0}
+.mock-receipt{background:#fff;border:1px dashed #7894a5;margin:10px auto 4px;padding:8px 12px;max-width:190px;text-align:center;font-size:12px;font-family:monospace;box-shadow:1px 2px 5px #0001}
+.mock-receipt div{text-align:left;border-bottom:1px dashed #eee;padding:3px}
+.mock-form-line{font-size:13px;padding:9px 12px;border-bottom:1px solid #bfcee4}
+.mock-form-line.emphasis{background:#ffe1b8;border:2px solid #cd632f;color:#85350e}
+/* Transfer table: vertically sticky column headings and horizontally pinned tank identifiers. */
+.transfer-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:17px 0 7px}
+.transfer-toolbar strong{color:#1a4b6c;font-size:16px}.transfer-toolbar span{font-size:12px;color:#5c7d93}
+.transfer-status{background:#eaf3f8;padding:8px 11px;border-radius:7px;color:#3c6079;font-size:13px;margin-bottom:4px}
+#transferWrap{overflow:auto;max-height:min(70dvh,570px);border:1px solid #9eb5c5;border-radius:7px;position:relative;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#transferWrap .paper{border-collapse:separate;border-spacing:0;min-width:1410px;table-layout:fixed;font-variant-numeric:tabular-nums}
+#transferWrap .paper col.col-no{width:48px}
+#transferWrap .paper col.col-cap{width:68px}
+#transferWrap .paper col.col-oil{width:53px}
+#transferWrap .paper thead tr:first-child{height:43px}
+#transferWrap .paper thead tr:nth-child(2){height:30px}
+#transferWrap .paper thead tr:nth-child(3){height:42px}
+#transferWrap .paper thead th{position:sticky;top:0;background:#e6f0f6;border-right:1px solid #a8bdce;border-bottom:1px solid #a8bdce;z-index:3;font-size:12px;white-space:normal}
+#transferWrap .paper thead tr:nth-child(2) th{top:43px}
+#transferWrap .paper thead tr:nth-child(3) th{top:73px}
+#transferWrap .paper tbody td{min-width:79px;background:#fff;border-right:1px solid #c5d4de;border-bottom:1px solid #c5d4de;height:41px;font-size:13px}
+#transferWrap .paper tbody tr:nth-child(even) td{background:#f7f9fb}
+#transferWrap .paper tbody td:nth-child(1),#transferWrap .paper thead th.sticky-identity:nth-child(1){position:sticky;left:0;z-index:4;min-width:48px;width:48px;background:#edf3f7}
+#transferWrap .paper tbody td:nth-child(2),#transferWrap .paper thead th.sticky-identity:nth-child(2){position:sticky;left:48px;z-index:4;min-width:68px;width:68px;background:#edf3f7}
+#transferWrap .paper tbody td:nth-child(3),#transferWrap .paper thead th.sticky-identity:nth-child(3){position:sticky;left:116px;z-index:4;min-width:53px;width:53px;background:#edf3f7}
+#transferWrap .paper thead th.sticky-identity{z-index:7;top:0!important;background:#dceaf4}
+#transferWrap .paper tbody tr:nth-child(even) :is(td:nth-child(1),td:nth-child(2),td:nth-child(3)){background:#e8f0f6}
+#transferWrap .paper th.a-h,#transferWrap .paper tbody td:nth-child(4){background:#e1f0ff}
+#transferWrap .paper th.b-h,#transferWrap .paper tbody td:nth-child(5){background:#e4f7eb}
+#transferWrap .paper th.c-h,#transferWrap .paper tbody td:nth-child(7){background:#ffefdf}
+#transferWrap .paper th.d-h,#transferWrap .paper tbody td:nth-child(8){background:#ffdeed}
+#transferWrap .paper tbody td:last-child{background:#eee5ff}
+#transferWrap .paper tbody td.bad{background:#ffdcdf!important;color:#9f1526}
+.transfer-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:13px}
+.transfer-actions button{flex:0 0 auto}
+.transfer-actions .caption{flex:1;margin:0;min-width:190px}
+.bottom button{min-width:0;flex:1}
+@media(max-width:400px){.visual-btn{font-size:10px;padding:6px 7px}.step-heading h2{font-size:16px}.mock-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bottom button{font-size:13px;padding:10px 3px}}

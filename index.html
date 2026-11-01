@@ -74,9 +74,11 @@ const three=one!==null&&two!==null?two-one:null;
 const q=valid(t.Q)?number(t.Q):null;
 const rate=three!==null&&q!==null&&q>0?three/q:null;
 const lim=t.oil==='K'?100:400;
-const ready=!!t.oil&&one!==null&&two!==null&&rate!==null;
-const bad=ready&&(Math.abs(three)>=lim||Math.abs(rate)>=0.025);
-return {one,two,three,q,rate,lim,ready,bad,state:!t.oil?'—':!ready?'要入力':bad?'×':'○'};
+const complete=!!t.oil&&one!==null&&two!==null&&q!==null&&q>=0;
+const noDelivery=complete&&q===0;
+const ready=complete&&q>0&&rate!==null;
+const bad=(ready&&(Math.abs(three)>=lim||Math.abs(rate)>=0.025))||(noDelivery&&Math.abs(three)>=lim);
+return {one,two,three,q,rate,lim,ready,bad,state:!t.oil?'—':!complete?'要入力':noDelivery?(bad?'要確認':'—'):bad?'×':'○'};
 }
 function init(){document.getElementById('photoSteps').innerHTML=photos.map(p=>`<div class="step"><b>${p.title}</b>${p.urgent?'<span class="badge" style="margin-left:8px;background:#fde8e8;color:#a32323">印刷のタイミング重要</span>':''}<p class="small">${p.detail}</p><div class="cameraInputs"><div class="captureBlock"><strong>📷 今からカメラで撮る</strong><input id="p-${p.id}" class="photoFile" type="file" accept="image/*" capture="environment" aria-label="${p.title}をカメラ撮影" onchange="choose('${p.id}',this)" /></div><div class="captureBlock"><strong>🖼 保存した写真を選ぶ</strong><input id="pick-${p.id}" class="photoFile" type="file" accept="image/*" aria-label="${p.title}の写真を選ぶ" onchange="choose('${p.id}',this)" /></div></div><div class="buttons"><button type="button" class="btn" onclick="ocr('${p.id}')">選んだ写真の数字を読み取る</button></div><div id="prev-${p.id}"></div><p id="stat-${p.id}" class="status">写真未選択</p></div>`).join('');
 const options=Array.from({length:10},(_,i)=>`<option value="${i}">タンク ${i+1}</option>`).join('');document.getElementById('tank').innerHTML=options;document.getElementById('ocrTank').innerHTML=options;load();renderPaper();}
@@ -98,4 +100,4 @@ function saveCsv(){const rows=[['タンクNo','タンク容量','油種','A','B'
 const csv='\ufeff'+rows.map(row=>row.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='燃料_荷卸し検証_原紙形式.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
 function resetAll(){if(!confirm('この端末の入力数字をすべて消去します。よろしいですか？'))return;tanks=Array.from({length:10},empty);save();load();renderPaper();}
 init();
-</script></body></html>
+</script><script src="./pair-ocr.js"></script></body></html>

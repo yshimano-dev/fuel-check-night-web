@@ -7,8 +7,7 @@
 <main>
  <section class="store-bar card" aria-label="店舗選択">
   <div><label for="storeSelect">使用する店舗</label><select id="storeSelect"></select></div>
-  <button type="button" id="openSettings" class="outline">店舗設定 <span aria-hidden="true">⚙</span></button>
-  <p class="caption">初回は伊都店を設定済み。他店舗は一度設定すると、このスマホに保存されます。</p>
+  <p class="caption">登録済みの店舗だけ選べます。新しい店舗の登録は管理者が行います。数字入力・判定はどなたでも使えます。</p>
  </section>
  <section class="card quick-flow" id="storeQuickFlow" aria-label="選択店舗の操作フローチャート">
   <div class="quick-head"><div><h2 id="quickStoreName">店舗の作業フロー</h2><p id="quickPosType">店舗を選んでください</p></div><span class="quick-tag">この店舗用</span></div>
@@ -46,22 +45,6 @@
   </div>
   <a class="quick-detail-link" href="#step1">下にスクロールすると、各操作と数字入力欄があります</a>
  </section>
- <details id="settings" class="card settings" hidden>
-  <summary>店舗・タンク設定を編集</summary>
-  <p class="caption">タンク数・番号・容量・油種を店舗ごとに設定できます。判定基準は油種に連動します。その他の油種は基準値を個別に設定してください。</p>
-  <div class="row"><label for="storeName">店舗名</label><input id="storeName" type="text" maxlength="40"></div>
-  <fieldset class="pos-setup"><legend>この店舗のPOS入庫設定</legend>
-    <label for="posCardName">転受カード一覧に出る「カード名称」</label>
-    <input id="posCardName" type="text" maxlength="70" placeholder="例：入庫（仕入先名）">
-    <label for="posCardNo">そのカードを選ぶ一覧番号（何番か）</label>
-    <input id="posCardNo" type="text" inputmode="numeric" maxlength="5" placeholder="例：2">
-    <p class="caption">例：伊都店「入庫（JX日光）」を2番で選択。別店舗では現場のPOS表示を確認してください。</p>
-  </fieldset>
-  <div id="tankSettings"></div>
-  <div class="actions"><button type="button" id="addTank" class="outline">＋ タンクを追加</button><button type="button" id="addStore" class="outline">＋ 別店舗を作る</button></div>
-  <div class="actions"><button type="button" id="copyStoreLink" class="outline">店舗設定をLINE共有用にコピー</button><button type="button" id="deleteStore" class="danger outline">この店舗設定を削除</button></div>
-  <div id="settingsMessage" class="caption" aria-live="polite"></div>
- </details>
  <div class="workflow-head">
   <div><b>作業の流れ</b><span id="dateLabel"></span></div>
   <button type="button" id="newJob" class="outline">新しい荷卸し</button>
@@ -173,6 +156,7 @@
 <div class="bottom">
  <button type="button" id="goTop">最初へ</button><button type="button" id="goResult">判定</button><button type="button" id="goPaper">紙へ転記</button>
 </div>
-<script src="./app.js?v=20261102-pos21"></script>
+<script src="./stores.js?v=20261102-owner"></script>
+<script src="./app.js?v=20261102-owner"></script>
 <script src="./visual-guide.js?v=20261102-pos21"></script>
 </body></html>

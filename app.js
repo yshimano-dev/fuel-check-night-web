@@ -62,93 +62,65 @@ function sanitizeStore(st){
  return {id:String(st.id||'s'+Date.now()),name,pos,posCardName,posCardNo,tanks};
 }
 function blankSession(){return {values:{},checks:{...DEFAULT_CHECKS},createdAt:Date.now()};}
-let state={stores:[ito()],active:'ito',sessions:{ito:blankSession()}};
+// 正式に登録された店舗だけを表示する。公開Webページからの新規店舗作成は行わない。
+function approvedStores(){
+ const entries=typeof window!=='undefined'&&Array.isArray(window.FUEL_APPROVED_STORES)
+  ? window.FUEL_APPROVED_STORES : [ito()];
+ const seen=new Set(),result=[];
+ for(const input of entries){
+  const st=sanitizeStore(input);
+  if(st&&!seen.has(st.id)){seen.add(st.id);result.push(st);}
+ }
+ return result.length?result:[sanitizeStore(ito())];
+}
+let state={stores:approvedStores(),active:'ito',sessions:{ito:blankSession()},cardOverrides:{}};
 function load(){
- try{
-  const s=JSON.parse(localStorage.getItem(STORAGE)||'null');
-  if(s&&Array.isArray(s.stores)&&s.stores.length){
-   const stores=s.stores.map(sanitizeStore).filter(Boolean);
-   if(stores.length){state={stores,active:stores.some(x=>x.id===s.active)?s.active:stores[0].id,sessions:(s.sessions&&typeof s.sessions==='object')?s.sessions:{}};}
-  } else {
-   // Start a new workflow with blank quantities. Never carry unverified data
-   // from an older app version into the next unloading operation.
+ let saved=null;
+ try{saved=JSON.parse(localStorage.getItem(STORAGE)||'null')}catch(e){}
+ const official=approvedStores();
+ const ids=new Set(official.map(s=>s.id));
+ const overrides={};
+ for(const st of official){
+  const explicit=saved?.cardOverrides?.[st.id];
+  const prior=Array.isArray(saved?.stores)?saved.stores.find(t=>t.id===st.id):null;
+  // 前バージョンで変更していたカード設定だけ移行。タンク・店舗名は管理者登録を優先。
+  const local=explicit||prior;
+  if(local&&(typeof local.posCardName==='string'||typeof local.posCardNo==='string')){
+   const name=String(local.posCardName??st.posCardName).trim().slice(0,70);
+   const num=String(local.posCardNo??st.posCardNo).trim();
+   overrides[st.id]={posCardName:name,posCardNo:/^\d{1,5}$/.test(num)?num:''};
   }
- }catch(e){state={stores:[ito()],active:'ito',sessions:{ito:blankSession()}};}
+ }
+ const stores=official.map(s=>({...s,...(overrides[s.id]||{})}));
+ const active=ids.has(saved?.active)?saved.active:stores[0].id;
+ const sessions=(saved?.sessions&&typeof saved.sessions==='object')?saved.sessions:{};
+ state={stores,active,sessions,cardOverrides:overrides};
  if(!state.sessions[state.active])state.sessions[state.active]=blankSession();
- applySharedStore();
+ // 未承認のローカル店舗や旧LINE登録リンクは選択に入れない。
 }
 function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state));}catch(e){}}
 function activeStore(){return state.stores.find(x=>x.id===state.active)||state.stores[0];}
 function session(){if(!state.sessions[state.active])state.sessions[state.active]=blankSession();return state.sessions[state.active];}
 function getEntry(t){const key=String(t.no);const s=session();if(!s.values[key])s.values[key]={A:'',B:'',C:'',D:'',Q:''};return s.values[key];}
-function encodedStore(st){
- // Only non-secret display information is shared. Staff codes never enter URLs.
- const text=JSON.stringify({name:st.name,pos:st.pos,posCardName:st.posCardName,posCardNo:st.posCardNo,tanks:st.tanks});
- return btoa(unescape(encodeURIComponent(text))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-function applySharedStore(){
- const hash=location.hash.match(/^#store=([A-Za-z0-9_-]+)$/);
- if(!hash)return;
- try{
-  const enc=hash[1].replace(/-/g,'+').replace(/_/g,'/');
-  const payload=JSON.parse(decodeURIComponent(escape(atob(enc))));
-  const st=sanitizeStore({...payload,id:'shared-'+Date.now()});
-  if(!st||!confirm('LINEで共有された「'+st.name+'」の店舗設定をこの端末に追加しますか？'))return;
-  state.stores.push(st);state.active=st.id;state.sessions[st.id]=blankSession();
-  save();history.replaceState(null,'',location.pathname+location.search);
- }catch(e){/* Invalid link is ignored; no data is changed. */}
-}
 function el(id){return document.getElementById(id);}
 function make(tag,cls,text){
  const node=document.createElement(tag);if(cls)node.className=cls;
  if(text!==undefined)node.textContent=text;return node;
 }
-function promptStore(){
- const name=prompt('新しい店舗名を入力してください');
- if(!name||!name.trim())return;
- const st=sanitizeStore({id:'s'+Date.now(),name,pos:'ENERIS',tanks:[{no:1,capacity:'',oil:'R'}]});
- if(!st)return;
- state.stores.push(st);state.active=st.id;state.sessions[st.id]=blankSession();save();renderAll();
- el('settings').hidden=false;el('settings').open=true;
- el('settings').scrollIntoView({behavior:'smooth'});
-}
 function renderStoreSelect(){
  const sel=el('storeSelect');sel.replaceChildren();
  for(const s of state.stores){const option=make('option','',s.name);option.value=s.id;sel.append(option);}
  sel.value=state.active;
- el('storeName').value=activeStore().name;
- el('posCardName').value=activeStore().posCardName||'';
- el('posCardNo').value=activeStore().posCardNo||'';
 }
 function updateStore(mut){
- mut(activeStore());
- const updated=sanitizeStore(activeStore());
- if(!updated)return;
- const index=state.stores.findIndex(s=>s.id===state.active);state.stores[index]=updated;
- // Hide stale data for removed tank numbers, but preserve data of active tanks.
- const valid=new Set(updated.tanks.map(t=>String(t.no)));
- for(const key of Object.keys(session().values))if(!valid.has(key))delete session().values[key];
+ const current=activeStore();
+ mut(current);
+ // 他の店舗・タンク・判定基準を上書きできないよう、カード名と選択番号だけ保存。
+ const name=String(current.posCardName||'').trim().slice(0,70);
+ const num=String(current.posCardNo||'').trim();
+ state.cardOverrides[state.active]={posCardName:name,posCardNo:/^\d{1,5}$/.test(num)?num:''};
+ state.stores=approvedStores().map(s=>({...s,...(state.cardOverrides[s.id]||{})}));
  save();renderAll();
-}
-function renderTankSettings(){
- const root=el('tankSettings');root.replaceChildren();
- const h=make('div','field-labels');['No.','容量','油種','基準L','基準%','削除'].forEach(s=>h.append(make('span','',s)));root.append(h);
- for(const tank of activeStore().tanks){
-  const r=make('div','tank-setting');
-  const no=make('b','',String(tank.no));r.append(no);
-  const cap=make('input');cap.type='text';cap.value=tank.capacity;cap.placeholder='例14KL';cap.maxLength=12;
-  cap.addEventListener('change',()=>updateStore(st=>{const t=st.tanks.find(x=>x.no===tank.no);if(t)t.capacity=cap.value.trim();}));r.append(cap);
-  const oil=make('select');for(const [v,lab] of FUELS){const opt=make('option','',lab);opt.value=v;oil.append(opt)}oil.value=tank.oil;
-  oil.addEventListener('change',()=>updateStore(st=>{const t=st.tanks.find(x=>x.no===tank.no);if(t){t.oil=oil.value;if(t.oil!=='OTHER'){delete t.limitL;delete t.limitPct;}}}));r.append(oil);
-  for(const type of ['limitL','limitPct']){
-   const inp=make('input');inp.inputMode='decimal';inp.type='number';inp.min='0';inp.step=type==='limitPct'?'0.1':'1';
-   const known=fuelLimit(tank.oil);inp.value=known?known[type==='limitL'?'liters':'percent']:(tank[type]??'');
-   inp.disabled=!!known;inp.title=known?'油種に応じた固定基準です':'店舗の正式な許容基準を入力';
-   inp.addEventListener('change',()=>updateStore(st=>{const t=st.tanks.find(x=>x.no===tank.no);if(t)t[type]=Number(inp.value)>0?Number(inp.value):null;}));r.append(inp);
-  }
-  const del=make('button','delete','×');del.type='button';del.title='このタンクを削除';del.disabled=activeStore().tanks.length<=1;
-  del.addEventListener('click',()=>{if(!confirm('タンクNo.'+tank.no+'を削除しますか？'))return;updateStore(st=>{st.tanks=st.tanks.filter(t=>t.no!==tank.no);});});r.append(del);root.append(r);
- }
 }
 function readStaffCode(storeId){
  try{
@@ -404,7 +376,7 @@ function renderChecks(){
  for(const inp of document.querySelectorAll('[data-check]'))inp.checked=Boolean(session().checks[inp.dataset.check]);
 }
 function renderAll(){
- renderStoreSelect();renderTankSettings();renderPos();renderQuickFlow();renderInputFields();renderChecks();renderResults();updateProgress();
+ renderStoreSelect();renderPos();renderQuickFlow();renderInputFields();renderChecks();renderResults();updateProgress();
 }
 function clearActiveJob(){
  if(!confirm('この店舗の入力数字・計算結果・進行チェックをすべてクリアします。店舗とタンク設定は残します。よろしいですか？'))return;
@@ -416,44 +388,11 @@ function startNewJob(){
  if(!confirm('この店舗の入力数字とチェックを消去して、新しい荷卸しを始めますか？'))return;
  state.sessions[state.active]=blankSession();save();renderAll();el('step1').scrollIntoView({behavior:'smooth'});
 }
-function addTank(){
- const st=activeStore();if(st.tanks.length>=20){alert('タンクは最大20件までです');return;}
- const existing=new Set(st.tanks.map(x=>x.no));
- const proposal=Array.from({length:30},(_,i)=>i+1).find(n=>!existing.has(n));
- const given=prompt('追加するタンク番号（1〜30）',String(proposal||1));
- if(given===null)return;
- const no=Number(given);
- if(!Number.isInteger(no)||no<1||no>30||existing.has(no)){alert('タンク番号は1〜30の未使用番号を指定してください');return;}
- updateStore(st=>st.tanks.push({no,capacity:'',oil:'R'}));
-}
-function deleteStore(){
- if(state.stores.length===1){alert('最後の1店舗は削除できません');return;}
- if(!confirm('「'+activeStore().name+'」と、その店舗の保存した数字を削除しますか？'))return;
- const id=state.active;writeStaffCode(id,'');state.stores=state.stores.filter(x=>x.id!==id);delete state.sessions[id];
- state.active=state.stores[0].id;save();renderAll();
-}
-async function copyStoreLink(){
- const u=location.origin+location.pathname+'#store='+encodedStore(activeStore());
- try{
-  await navigator.clipboard.writeText(u);
-  el('settingsMessage').textContent='店舗設定リンクをコピーしました。LINEに貼り付けて共有できます（数値は含みません）。';
- }catch(e){prompt('このリンクをコピーしてLINEで送ってください',u);}
-}
 function init(){
  load();renderAll();
  el('storeSelect').addEventListener('change',e=>{
   state.active=e.target.value;if(!state.sessions[state.active])state.sessions[state.active]=blankSession();
   save();renderAll();
- });
- el('openSettings').addEventListener('click',()=>{
-  const root=el('settings');root.hidden=!root.hidden;if(!root.hidden){root.open=true;root.scrollIntoView({behavior:'smooth',block:'start'});}
- });
- el('storeName').addEventListener('change',e=>updateStore(st=>{st.name=e.target.value.trim()||st.name;}));
- el('posCardName').addEventListener('change',e=>updateStore(st=>{st.posCardName=e.target.value.trim();}));
- el('posCardNo').addEventListener('change',e=>{
-  const next=e.target.value.trim();
-  if(next&&!/^\d{1,5}$/.test(next)){alert('カード番号は5桁以内の数字で入力してください。');renderStoreSelect();return;}
-  updateStore(st=>{st.posCardNo=next;});
  });
  el('quickEditCard').addEventListener('click',()=>{
   if(el('quickCardEditor').hidden)openQuickCardEditor();
@@ -469,10 +408,6 @@ function init(){
  el('quickSaveCode').addEventListener('click',saveQuickCode);
  el('quickCodeInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveQuickCode();}});
  el('toggleStaffCode').addEventListener('click',openQuickCodeEditor);
- el('addStore').addEventListener('click',promptStore);
- el('addTank').addEventListener('click',addTank);
- el('deleteStore').addEventListener('click',deleteStore);
- el('copyStoreLink').addEventListener('click',copyStoreLink);
  el('newJob').addEventListener('click',startNewJob);
  el('clearDigits').addEventListener('click',clearActiveJob);
  el('goTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));

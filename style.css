@@ -132,3 +132,10 @@ footer{text-align:center;color:#6c8190;margin:23px 0;font-size:12px}.bottom{posi
 .transfer-actions .caption{flex:1;margin:0;min-width:190px}
 .bottom button{min-width:0;flex:1}
 @media(max-width:400px){.visual-btn{font-size:10px;padding:6px 7px}.step-heading h2{font-size:16px}.mock-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bottom button{font-size:13px;padding:10px 3px}}
+
+/* Additional POS21 diagrams, available only inside the reference popup. */
+.visual-warning{background:#fff5e8;border-left:3px solid #da8842;color:#6e4a24;padding:9px 11px;border-radius:5px;font-size:13px;line-height:1.5}
+.visual-alternate{margin-top:15px;padding:12px;background:#f0f5fa;border-radius:9px;border:1px solid #cbdae7}
+.visual-alternate>strong{font-size:14px;color:#204c6a}
+.visual-alternate-actions{display:flex;gap:7px;flex-wrap:wrap}
+.visual-alternate-actions button{background:white;color:#18547b;border:1px solid #b0cada;border-radius:8px;padding:9px 11px;font-weight:800;flex:1;min-width:140px;font-size:12px}

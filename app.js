@@ -117,7 +117,6 @@ function renderStoreSelect(){
  for(const s of state.stores){const option=make('option','',s.name);option.value=s.id;sel.append(option);}
  sel.value=state.active;
  el('storeName').value=activeStore().name;
- el('posType').value=activeStore().pos;
  el('posCardName').value=activeStore().posCardName||'';
  el('posCardNo').value=activeStore().posCardNo||'';
 }
@@ -279,8 +278,8 @@ function renderPos(){
  'カード名称：'+chosenName,'一覧の選択番号：'+chosenNo,
  '店受けカード一覧','担当者コード：'+(readStaffCode(store.id)||'未登録（上部の店舗フローで設定）'),'商品パネル','油種選択','タンクNo.','数量','単価は削除・金額は未入力'
  ]:[
- 'メインメニュー','伝票入力','仕入','仕入先選択（店舗の設定を確認）',
- 'エネオス','確定（2回）','油種選択','タンクNo.・数量'
+ 'メインメニュー','伝票入力','仕入','仕入先選択',
+ 'エネオス','確定（2回）','タンクNo.と数量のみ入力','油種選択（必要なら繰り返す）'
  ];
  el('prePosTitle').textContent=pos==='ENERIS'?'ENERIS-POS：荷卸し前のタンク管理表':'POS21：荷卸し前のタンク管理表';
  renderPath('prePosPath',pre);
@@ -450,7 +449,6 @@ function init(){
   const root=el('settings');root.hidden=!root.hidden;if(!root.hidden){root.open=true;root.scrollIntoView({behavior:'smooth',block:'start'});}
  });
  el('storeName').addEventListener('change',e=>updateStore(st=>{st.name=e.target.value.trim()||st.name;}));
- el('posType').addEventListener('change',e=>updateStore(st=>{st.pos=e.target.value;}));
  el('posCardName').addEventListener('change',e=>updateStore(st=>{st.posCardName=e.target.value.trim();}));
  el('posCardNo').addEventListener('change',e=>{
   const next=e.target.value.trim();

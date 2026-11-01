@@ -16,7 +16,7 @@ st.textContent=`#pairPanel{border:2px solid #75a8c5}.pair-grid{display:grid;grid
 document.head.appendChild(st);
 const panel=`<div class="panel" id="pairPanel">
 <h2>写真2枚をまとめて仮読取</h2>
-<p class="small">前後それぞれ「タンク管理表＋右下のレシート」を貼った用紙を撮影します。数字の取り違えを防ぐため、OCR候補は自動確定しません。</p>
+<p class="small">前後それぞれ「タンク管理表＋右下のレシート」を貼った用紙を撮影します。数字の取り違えを防ぐため、この4セットと同じ4油種のタンク配置が前提です。OCR候補は自動確定しません。</p>
 <div class="pair-grid">
 <div><label>① 荷卸し前の用紙</label><input id="pairBefore" type="file" accept="image/*" capture="environment"><p id="beforeName" class="micro">未選択</p></div>
 <div><label>② 荷卸し後の用紙</label><input id="pairAfter" type="file" accept="image/*" capture="environment"><p id="afterName" class="micro">未選択</p></div></div>
@@ -67,7 +67,7 @@ function cropPhoto(cfg){
 }
 function drawCrop(cfg){const target=document.getElementById('crop-'+cfg.id),src=cropPhoto(cfg);if(!target)return;if(!src){target.width=1;target.height=1;return}target.width=src.width;target.height=src.height;target.getContext('2d').drawImage(src,0,0)}
 function renderCrops(){
- document.getElementById('pairCrops').innerHTML=configs.map(c=>`<div class="pair-config"><b>${c.name}</b><div class="mini-controls"><label>左右位置<input type="range" data-id="${c.id}" data-part="0" min="10" max="85" value="${c.rect[0]}"></label><label>上下位置<input type="range" data-id="${c.id}" data-part="1" min="5" max="86" value="${c.rect[1]}"></label></div><canvas id="crop-${c.id}" class="pair-crop"></canvas><span id="cropStatus-${c.id}" class="micro">未読取</span></div>`).join('');
+ document.getElementById('pairCrops').innerHTML=configs.map(c=>`<div class="pair-config"><b>${c.name}</b><div class="mini-controls"><label>左右位置<input type="range" data-id="${c.id}" data-part="0" min="10" max="85" value="${c.rect[0]}"></label><label>上下位置<input type="range" data-id="${c.id}" data-part="1" min="5" max="86" value="${c.rect[1]}"></label><label>切り出し高さ<input type="range" data-id="${c.id}" data-part="3" min="6" max="35" value="${c.rect[3]}"></label></div><canvas id="crop-${c.id}" class="pair-crop"></canvas><span id="cropStatus-${c.id}" class="micro">未読取</span></div>`).join('');
  for(const input of document.querySelectorAll('#pairCrops input[type=range]'))input.addEventListener('input',()=>{const cfg=configs.find(c=>c.id===input.dataset.id);cfg.rect[Number(input.dataset.part)]=Number(input.value);drawCrop(cfg)});
  configs.forEach(drawCrop);
 }
@@ -91,6 +91,8 @@ async function startPair(){
  if(running)return;
  if(!fileMap.before||!fileMap.after){alert('前後2枚の写真を選択してください');return}
  running=true;document.getElementById('pairRun').disabled=true;
+ for(const [oil] of order)drafts[oil]={A:'',B:'',C:'',D:'',Q:''};
+ document.getElementById('pairConfirm').checked=false;
  try{
   status('画像を読み込み中…');for(const k of ['before','after'])photoCanvases[k]=await fileCanvas(fileMap[k]);
   renderCrops();const t=await getWorker();let success=0;

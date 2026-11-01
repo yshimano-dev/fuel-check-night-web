@@ -2,10 +2,10 @@
 (function(root,factory){const p=factory();if(typeof module==='object'&&module.exports)module.exports=p;if(root)root.FuelLayoutParser=p;})(typeof window!=='undefined'?window:null,function(){
 'use strict';
 const oils=['H','R','D','K'], zones={
-main:{x:[.405,.545],y:[.095,.235],kind:'volume'},
-physical:{x:[.348,.505],y:[.47,.665],kind:'volume'},
-receipt:{x:[.768,.953],y:[.657,.877],kind:'receipt'},
-quantity:{x:[.295,.425],y:[.095,.235],kind:'quantity'}};
+main:{x:[.44,.50],y:[.14,.235],kind:'volume'},
+physical:{x:[.36,.455],y:[.51,.665],kind:'volume'},
+receipt:{x:[.79,.95],y:[.68,.86],kind:'receipt'},
+quantity:{x:[.30,.36],y:[.14,.235],kind:'quantity'}};
 function tokens(p){if(!p||!Array.isArray(p.words)||!(p.pageWidth>0)||!(p.pageHeight>0))return [];
 return p.words.map(w=>({raw:String(w.text||'').replace(/[０-９]/g,ch=>String(ch.charCodeAt(0)-65296)).replace(/，/g,',').replace(/．/g,'.'),
 x:(w.x+(w.width||0)/2)/p.pageWidth,y:(w.y+(w.height||0)/2)/p.pageHeight,h:(w.height||0)/p.pageHeight})).filter(t=>Number.isFinite(t.x)&&Number.isFinite(t.y));}

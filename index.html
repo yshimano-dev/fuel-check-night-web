@@ -1,94 +1,110 @@
 <!doctype html>
 <html lang="ja">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#123d56">
-<title>荷卸し検証｜手入力・自動判定</title>
-<link rel="stylesheet" href="./style.css">
-</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#123d56">
+<title>荷卸し検証｜夜勤作業ガイド</title><link rel="stylesheet" href="./style.css?v=20261102-workflow"></head>
 <body>
-<header class="top">
- <div class="top-inner">
-  <h1>荷卸し検証チェック</h1>
-  <p>手入力専用｜数字を入れるだけで自動計算</p>
- </div>
-</header>
+<header class="top"><div class="top-inner"><h1>荷卸し検証・夜勤ガイド</h1><p>上から順番に操作・数字入力・判定確認</p></div></header>
 <main>
- <div class="urgent"><strong>最優先：</strong>ローリー到着直後に荷卸し前の在庫レシートを印字。受け入れ完了後にもう一度印字。</div>
- <div id="oldData" class="old-data" hidden>前回の入力数値が残っています。今回の作業なら <button type="button" id="newTop">新しい検証を始める</button> を押してください。</div>
- <nav class="tabs" aria-label="画面切り替え">
-  <button type="button" id="tab-entry" class="active" aria-current="page">① 数字入力</button>
-  <button type="button" id="tab-paper">② 紙へ転記</button>
-  <button type="button" id="tab-guide">使い方</button>
- </nav>
- <section id="entryView">
-  <div class="card intro">
-   <div class="section-head"><h2>帳票を見ながら順番に入力</h2><span id="progress" class="progress">0 / 20欄</span></div>
-   <p>油種・タンク番号・容量は設定済み。<strong>入力するのは数字だけ</strong>です。タンク1＝H、2＝R、3＝D、10＝K。</p>
-   <p class="subnote">入力欄を押すとスマホの数字キーボードが開きます。入力した数字はこの端末に一時保存されます。</p>
-  </div>
-  <div class="stage-list" id="stageNav" aria-label="入力する帳票を選ぶ"></div>
-  <div class="card stage-card" id="stageCard">
-   <div class="stage-title">
-    <span id="stageTag" class="stage-tag">A</span>
-    <div><h2 id="stageTitle">荷卸し前の計算在庫</h2><p id="stageSource">荷卸し前タンク管理表</p></div>
-   </div>
-   <div class="source-note" id="stageHint"></div>
-   <div class="inputs" id="stageInputs"></div>
-   <div class="nav-actions">
-    <button type="button" id="prevStage" class="secondary">← 前の帳票</button>
-    <button type="button" id="nextStage" class="primary">次の帳票 →</button>
-   </div>
-  </div>
-  <p class="save-note">※ 数字の読み違いがないか、元の印刷物と照合してください。電子計算だけで正式な検証は完了しません。</p>
+ <div class="notice"><b>ローリー到着直後が最優先</b>：油面計の荷卸し前「在庫レシート」をすぐ印字。受け入れ後ももう一度印字します。</div>
+ <section class="store-bar card" aria-label="店舗選択">
+  <div><label for="storeSelect">使用する店舗</label><select id="storeSelect"></select></div>
+  <button type="button" id="openSettings" class="outline">店舗設定 <span aria-hidden="true">⚙</span></button>
+  <p class="caption">初回は伊都店を設定済み。他店舗は一度設定すると、このスマホに保存されます。</p>
  </section>
- <section id="paperView" hidden>
-  <div class="card">
-   <div class="section-head"><h2>荷卸し検証チェック表</h2><span id="judgementSummary" class="summary-count"></span></div>
-   <p class="small">原紙と同じ並び。<strong>左右にスクロール</strong>して確認できます。行を押すと、そのタンクの入力欄に戻ります。</p>
-   <div class="legend">
-    <span><b class="color-dot a"></b>A 前計算</span><span><b class="color-dot b"></b>B 前実在庫</span><span><b class="color-dot c"></b>C 後計算</span><span><b class="color-dot d"></b>D 後実在庫</span><span><b class="color-dot q"></b>④ 入荷量</span>
-   </div>
-   <div class="table-wrap">
-    <table class="paper" aria-label="荷卸し検証チェック表">
-     <thead>
-      <tr><th rowspan="3">タンク<br>No.</th><th rowspan="3">タンク<br>容量</th><th rowspan="3">油種</th><th colspan="3">荷卸し前（L）</th><th colspan="3">荷卸し後（L）</th><th rowspan="3">誤差数量<br>③</th><th rowspan="3">誤差率<br>③÷④</th><th rowspan="3">許容範囲</th><th rowspan="3">判定</th><th rowspan="3">今回入荷数量<br>④</th></tr>
-      <tr><th colspan="3">前尺誤差</th><th colspan="3">後尺誤差</th></tr>
-      <tr><th class="source-a">計算在庫<br>A</th><th class="source-b">実在庫<br>B</th><th>誤差<br>B−A＝①</th><th class="source-c">計算在庫<br>C</th><th class="source-d">実在庫<br>D</th><th>誤差<br>D−C＝②</th></tr>
-     </thead>
-     <tbody id="paperBody"></tbody>
-    </table>
-   </div>
-   <div id="mobilePaper" class="paper-cards"></div>
-   <div class="warn">「×」や「要確認」が出た場合は現場の判断フローと上長の指示に従ってください。最終的に紙の検証チェック表へ記入し、前後の帳票と3枚1セットで保存します。</div>
-  </div>
+ <details id="settings" class="card settings" hidden>
+  <summary>店舗・タンク設定を編集</summary>
+  <p class="caption">タンク数・番号・容量・油種を店舗ごとに設定できます。判定基準は油種に連動します。その他の油種は基準値を個別に設定してください。</p>
+  <div class="row"><label for="storeName">店舗名</label><input id="storeName" type="text" maxlength="40"></div>
+  <div class="row"><label for="posType">POSの種類</label><select id="posType"><option value="ENERIS">ENERIS-POS</option><option value="POS21">POS21</option></select></div>
+  <div id="tankSettings"></div>
+  <div class="actions"><button type="button" id="addTank" class="outline">＋ タンクを追加</button><button type="button" id="addStore" class="outline">＋ 別店舗を作る</button></div>
+  <div class="actions"><button type="button" id="copyStoreLink" class="outline">店舗設定をLINE共有用にコピー</button><button type="button" id="deleteStore" class="danger outline">この店舗設定を削除</button></div>
+  <div id="settingsMessage" class="caption" aria-live="polite"></div>
+ </details>
+ <div class="workflow-head">
+  <div><b>作業の流れ</b><span id="dateLabel"></span></div>
+  <button type="button" id="newJob" class="outline">新しい荷卸し</button>
+ </div>
+ <div id="progressLine" class="progress-line"></div>
+
+ <section class="step card" id="step1">
+  <div class="step-heading"><span class="count urgent-num">1</span><div><h2>ローリー到着直後</h2><p>最初に行うこと</p></div></div>
+  <div class="important">油面計の <strong>［印刷］→［レシート印字］</strong> を押す。荷卸し前の在庫レシートを取ります。</div>
+  <label class="check"><input type="checkbox" data-check="preReceipt">荷卸し前のレシートを印字した</label>
  </section>
- <section id="guideView" hidden>
-  <div class="card">
-   <h2>入力の順番</h2>
-   <ol class="guide-steps">
-    <li><strong>ローリー到着したら最優先</strong>で油面計の荷卸し前レシートを印字。</li>
-    <li><strong>青 A：</strong>荷卸し前「タンク管理表」の計算在庫。</li>
-    <li><strong>緑 B：</strong>荷卸し前「在庫レシート」の実在庫。</li>
-    <li>受け入れ完了後に<strong>もう一度在庫レシートを印字</strong>。</li>
-    <li><strong>オレンジ C：</strong>荷卸し後「タンク管理表」の計算在庫。</li>
-    <li><strong>ピンク D：</strong>荷卸し後「在庫レシート」の実在庫。</li>
-    <li><strong>紫 ④：</strong>荷卸し後タンク管理表の今回入荷数量（実数を確認）。入荷なしは「0」。</li>
-    <li>「紙へ転記」で誤差と判定を確認し、正式な紙に手書きで記入。</li>
-   </ol>
-   <div class="info">タンク管理表・レシートでは灯油が<strong>4行目</strong>ですが、正式なチェック表では<strong>10番 K（20KL）</strong>です。4〜9番のタンク欄は空欄のままです。</div>
-   <h3>自動計算の仕組み</h3>
-   <p>①＝B−A、②＝D−C、③＝②−①、誤差率＝③÷④×100</p>
-   <p>H・R・D：誤差量が<strong>±400L以上</strong>または誤差率が<strong>±2.5%以上</strong>で×。K：誤差量が<strong>±100L以上</strong>または誤差率が<strong>±2.5%以上</strong>で×。</p>
-   <p>④が0Lなら誤差率を表示せず、数量誤差が基準以上のときだけ×です。数字が不足している間は「要入力」と表示します。</p>
-   <div class="warn">このアプリは非公式の計算補助です。コンタミが疑われる場合は該当油種の販売を停止し、上長へ連絡するなど、会社の正式な手順を優先してください。</div>
-   <button type="button" id="newFromGuide" class="secondary danger">新しい荷卸しを始める（数字を消去）</button>
-  </div>
+
+ <section class="step card" id="step2">
+  <div class="step-heading"><span class="count">2</span><div><h2>荷卸し前のPOS帳票を印刷</h2><p>荷卸し前の計算在庫を確認</p></div></div>
+  <div class="role-note">POS操作は店舗で操作権限のある担当者が行ってください。夜勤スタッフが操作できない場合は、担当者から帳票を受け取ります。</div>
+  <h3 id="prePosTitle">POS操作順</h3>
+  <div id="prePosPath" class="path"></div>
+  <label class="check"><input type="checkbox" data-check="prePos">荷卸し前のタンク管理表（POS印刷）を用意した</label>
  </section>
+
+ <section class="step card" id="step3">
+  <div class="step-heading"><span class="count">3</span><div><h2>荷卸し前の数字を入力</h2><p>A・Bは前のPOS帳票とレシートから</p></div></div>
+  <div class="source-block source-a"><span class="field-symbol">A</span><div><h3>荷卸し前の計算在庫</h3><p>タンク管理表の「計算在庫（L）」</p></div></div>
+  <div id="inputsA" class="input-grid"></div>
+  <div class="source-block source-b"><span class="field-symbol">B</span><div><h3>荷卸し前の実在庫</h3><p>到着直後に取った油面計レシートの「在庫量（L）」</p></div></div>
+  <div id="inputsB" class="input-grid"></div>
+ </section>
+
+ <section class="step card" id="step4">
+  <div class="step-heading"><span class="count">4</span><div><h2>燃料の受け入れ</h2><p>店舗の正式な荷卸し手順に従う</p></div></div>
+  <p>安全確認・接続・荷卸しは店舗の正式手順と担当者の指示に従って進めます。このアプリは受け入れ作業そのものを指示・承認するものではありません。</p>
+  <label class="check"><input type="checkbox" data-check="unloading">受け入れが完了した</label>
+ </section>
+
+ <section class="step card" id="step5">
+  <div class="step-heading"><span class="count urgent-num">5</span><div><h2>受け入れ完了後、再びレシート印字</h2><p>ここでも印刷を優先</p></div></div>
+  <div class="important">油面計の <strong>［印刷］→［レシート印字］</strong> をもう一度押し、荷卸し後の在庫レシートを取ります。</div>
+  <label class="check"><input type="checkbox" data-check="postReceipt">荷卸し後の在庫レシートを印字した</label>
+ </section>
+
+ <section class="step card" id="step6">
+  <div class="step-heading"><span class="count">6</span><div><h2>POS入庫処理・荷卸し後の帳票</h2><p>POSで入庫数量を記録し、その後の帳票を出力</p></div></div>
+  <div class="role-note">POSの入庫入力は権限のある担当者が実施。操作内容・数量・油種を元の配送伝票と照合してください。</div>
+  <h3>入庫（仕入）の操作順</h3>
+  <div id="postPosPath" class="path"></div>
+  <p class="caption" id="posNote"></p>
+  <label class="check"><input type="checkbox" data-check="posEntered">POSの入庫処理が完了したことを確認した</label>
+  <h3>荷卸し後のタンク管理表を印刷</h3>
+  <div id="postReportPath" class="path"></div>
+  <label class="check"><input type="checkbox" data-check="postPos">荷卸し後のタンク管理表を用意した</label>
+ </section>
+
+ <section class="step card" id="step7">
+  <div class="step-heading"><span class="count">7</span><div><h2>荷卸し後の数字を入力</h2><p>C・D・④を順番に入力</p></div></div>
+  <div class="source-block source-c"><span class="field-symbol">C</span><div><h3>荷卸し後の計算在庫</h3><p>荷卸し後のPOSタンク管理表「計算在庫（L）」</p></div></div>
+  <div id="inputsC" class="input-grid"></div>
+  <div class="source-block source-d"><span class="field-symbol">D</span><div><h3>荷卸し後の実在庫</h3><p>荷卸し後の油面計レシート「在庫量（L）」</p></div></div>
+  <div id="inputsD" class="input-grid"></div>
+  <div class="source-block source-q"><span class="field-symbol">④</span><div><h3>今回入荷数量</h3><p>POSタンク管理表の「当日入荷（L）」。入荷がなければ0を入力</p></div></div>
+  <div id="inputsQ" class="input-grid"></div>
+  <p class="caption">実際のレシートでは灯油が4行目でも、伊都店の紙チェック表では10番Kです。店舗設定のタンクNo.を確認してください。</p>
+ </section>
+
+ <section class="step card outcome" id="step8">
+  <div class="step-heading"><span class="count">8</span><div><h2>自動計算・判定を確認</h2><p>運転手への確認報告の前に必ず確認</p></div></div>
+  <div id="overall" class="overall neutral" role="status" aria-live="polite">数字の入力待ち</div>
+  <p class="caption">数値判定は「販売・荷卸しの最終許可」ではありません。コンタミの疑い、帳票の不一致、上長確認事項は正式な判断フローを優先してください。</p>
+  <div id="results" class="results"></div>
+  <details class="paper-detail"><summary>紙のチェック表と同じ横並びを確認</summary>
+   <div class="table-wrap"><table class="paper"><thead><tr><th>タンクNo.</th><th>容量</th><th>油種</th><th>A</th><th>B</th><th>① B−A</th><th>C</th><th>D</th><th>② D−C</th><th>③ ②−①</th><th>率</th><th>許容</th><th>判定</th><th>④</th></tr></thead><tbody id="paperBody"></tbody></table></div>
+  </details>
+  <div class="warn">「×」「要入力」「基準未設定」があれば未完了です。数値が○でも、運転手への確認終了は店舗の他の必要な確認が終わってからにしてください。</div>
+ </section>
+
+ <section class="step card" id="step9">
+  <div class="step-heading"><span class="count">9</span><div><h2>紙に転記・3枚1セットで保存</h2><p>正式記録として保管</p></div></div>
+  <p>計算結果を印刷済みの<strong>荷卸し検証チェック表</strong>へ手書きし、荷卸し前・後のタンク管理表＋レシートと合わせて<strong>3枚1セット</strong>で保存します。</p>
+  <p class="caption">紙への転記を運転手の出発後に行ってよいかは、各店舗の責任者の運用指示を優先してください。</p>
+  <label class="check"><input type="checkbox" data-check="paperSaved">紙への転記・3枚保存まで済んだ</label>
+ </section>
+
+ <footer><small>非公式の業務補助ツールです。入力した数字と店舗設定はこの端末のブラウザに保存され、写真や数字を外部AIへ送信しません。</small></footer>
 </main>
-<footer class="footer">数字入力専用／写真の送信・外部AI・利用者登録は不要です</footer>
-<div class="bottom-bar"><button type="button" id="bottomEntry">数字を入力</button><button type="button" id="bottomPaper">計算結果を見る</button></div>
-<script src="./app.js"></script>
-</body>
-</html>
+<div class="bottom">
+ <button type="button" id="goTop">最初へ</button><button type="button" id="goResult">判定を見る</button>
+</div>
+<script src="./app.js?v=20261102-workflow"></script></body></html>

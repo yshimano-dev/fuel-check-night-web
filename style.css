@@ -57,3 +57,18 @@ footer{text-align:center;color:#6c8190;margin:23px 0;font-size:12px}.bottom{posi
 .staff-code-controls{display:flex;gap:8px}
 .staff-code-card input{height:46px;font-size:19px;font-weight:800;flex:1;min-width:0;border:1px solid #aac1d1;border-radius:8px;padding:8px}
 .staff-code-card input[readonly]{background:#f2f6f9}
+
+/* Clearly labelled, per-store card selection beside the staff code. */
+.quick-card-select{background:#f4f9ff;border:1px solid #bad3e5;border-radius:9px;padding:11px;margin:12px 0}
+.quick-card-head{display:flex;justify-content:space-between;align-items:center;gap:9px}
+.quick-card-head>div{min-width:0;flex:1}
+.quick-card-kicker{display:block;color:#4f6c83;font-size:12px;font-weight:800;margin-bottom:4px}
+.quick-card-head strong{display:block;color:#164e77;font-size:15px;line-height:1.35;overflow-wrap:anywhere}
+.quick-card-head button{flex-shrink:0;font-size:12px;max-width:126px;white-space:normal;padding:8px}
+#quickCardEditor{margin-top:12px;padding-top:11px;border-top:1px solid #ccdfeb}
+#quickCardEditor[hidden],#quickCardSelect[hidden]{display:none}
+#quickCardEditor label{display:block;font-size:13px;font-weight:800;color:#244f70;margin:10px 0 5px}
+#quickCardEditor input{display:block;width:100%;height:46px;border:1px solid #9fbfd6;border-radius:8px;padding:8px 10px;font-size:17px;background:#fff}
+.quick-edit-actions{display:flex;gap:8px;margin-top:11px}
+.quick-edit-actions button{flex:1;min-width:0}
+.quick-edit-actions .quick-save{background:#17618a;color:white;border-color:#17618a}

@@ -177,9 +177,29 @@ function flowRow(id,heading,items){
   const chip=make('a','click'+(item.important?' emphasized':''),item.label);
   chip.href=item.href;
   if(item.href==='#quickCodeEditor')chip.addEventListener('click',e=>{e.preventDefault();openQuickCodeEditor();});
+  if(item.href==='#quickCardEditor')chip.addEventListener('click',e=>{e.preventDefault();openQuickCardEditor();});
   path.append(chip);
  });
  root.append(path);
+}
+function openQuickCardEditor(){
+ if(activeStore().pos!=='ENERIS')return;
+ const st=activeStore();
+ el('quickCardName').value=st.posCardName||'';
+ el('quickCardNo').value=st.posCardNo||'';
+ const box=el('quickCardEditor');box.hidden=false;
+ box.scrollIntoView({behavior:'smooth',block:'center'});
+ el('quickCardName').focus({preventScroll:true});
+}
+function saveQuickCard(){
+ const name=el('quickCardName').value.trim();
+ const num=el('quickCardNo').value.trim().replace(/[０-９]/g,ch=>String(ch.charCodeAt(0)-65296));
+ if(!name||!/^\d{1,5}$/.test(num)){
+  alert('「POSのカード名称」と「カード一覧で選ぶ番号（1〜5桁）」の両方を入力してください。');
+  return;
+ }
+ updateStore(st=>{st.posCardName=name;st.posCardNo=num;});
+ el('quickCardEditor').hidden=true;
 }
 function openQuickCodeEditor(){
  const editor=el('quickCodeEditor');
@@ -217,8 +237,8 @@ function renderQuickFlow(){
    {label:'レシート再印字',href:'#step5',important:true},
    {label:'POS → 入庫',href:'#step6'},
    {label:'転受カード一覧',href:'#step6'},
-   {label:'カード名称 '+name,href:'#step6'},
-   {label:no,href:'#step6',important:true},
+   {label:'カード名称 '+name,href:'#quickCardEditor'},
+   {label:no+'（タップして変更）',href:'#quickCardEditor',important:true},
    {label:'店受けカード一覧',href:'#step6'},
    {label:'担当者コード '+(code||'未登録'),href:'#quickCodeEditor',important:true},
    {label:'油種・数量 → 後POS印刷',href:'#step6'},
@@ -234,6 +254,13 @@ function renderQuickFlow(){
    {label:'判定',href:'#step8'}
   ]);
  }
+ const cardBox=el('quickCardSelect');
+ cardBox.hidden=pos!=='ENERIS';
+ el('quickCardValue').textContent=st.posCardName&&st.posCardNo?
+  'カード名称「'+st.posCardName+'」／ '+st.posCardNo+'番を選択':'カード名称または選択番号が未設定';
+ el('quickCardName').value=st.posCardName||'';
+ el('quickCardNo').value=st.posCardNo||'';
+ el('quickCardEditor').hidden=true;
  el('quickCodeValue').textContent=code||'未登録（初回のみ設定）';
  const edit=el('quickCodeEditor');edit.hidden=true;
  el('quickCodeInput').value=code;
@@ -421,6 +448,13 @@ function init(){
   if(next&&!/^\d{1,5}$/.test(next)){alert('カード番号は5桁以内の数字で入力してください。');renderStoreSelect();return;}
   updateStore(st=>{st.posCardNo=next;});
  });
+ el('quickEditCard').addEventListener('click',()=>{
+  if(el('quickCardEditor').hidden)openQuickCardEditor();
+  else el('quickCardEditor').hidden=true;
+ });
+ el('quickSaveCard').addEventListener('click',saveQuickCard);
+ el('quickCancelCard').addEventListener('click',()=>{el('quickCardEditor').hidden=true;});
+ el('quickCardNo').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveQuickCard();}});
  el('quickEditCode').addEventListener('click',()=>{
   if(el('quickCodeEditor').hidden)openQuickCodeEditor();
   else el('quickCodeEditor').hidden=true;

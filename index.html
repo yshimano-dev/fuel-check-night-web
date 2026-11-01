@@ -15,6 +15,23 @@
   <div class="quick-urgent">最優先：ローリー到着直後に油面計の在庫レシートを印字。受け入れ終了後にもう一度印字。</div>
   <div id="quickBefore" class="quick-flow-path"></div>
   <div id="quickAfter" class="quick-flow-path"></div>
+  <div class="quick-card-select" id="quickCardSelect">
+    <div class="quick-card-head">
+      <div>
+        <span class="quick-card-kicker">転受カード一覧で選ぶ入庫カード</span>
+        <strong id="quickCardValue">カード名・番号は未設定</strong>
+      </div>
+      <button type="button" id="quickEditCard" class="outline">カードを変更・登録</button>
+    </div>
+    <div id="quickCardEditor" hidden>
+      <label for="quickCardName">① POS画面の「カード名称」に表示される名前</label>
+      <input id="quickCardName" type="text" maxlength="70" placeholder="例：入庫（JX日光）" autocomplete="off">
+      <label for="quickCardNo">② そのカードを選ぶときの一覧番号（何番か）</label>
+      <input id="quickCardNo" type="text" inputmode="numeric" maxlength="5" placeholder="例：2" autocomplete="off">
+      <p class="caption">伊都店の例：カード名称「入庫（JX日光）」→ 2番を選択。店舗によって異なるので、POS画面の表示を確認して登録してください。</p>
+      <div class="quick-edit-actions"><button type="button" class="outline" id="quickCancelCard">キャンセル</button><button type="button" class="outline quick-save" id="quickSaveCard">この店舗に保存</button></div>
+    </div>
+  </div>
   <div class="quick-code">
     <div class="quick-code-head">
       <strong>担当者コード：<span id="quickCodeValue">未設定</span></strong>
@@ -34,11 +51,11 @@
   <div class="row"><label for="storeName">店舗名</label><input id="storeName" type="text" maxlength="40"></div>
   <div class="row"><label for="posType">POSの種類</label><select id="posType"><option value="ENERIS">ENERIS-POS</option><option value="POS21">POS21</option></select></div>
   <fieldset class="pos-setup"><legend>この店舗のPOS入庫設定</legend>
-    <label for="posCardName">カード名称・仕入先の表示名</label>
+    <label for="posCardName">転受カード一覧に出る「カード名称」</label>
     <input id="posCardName" type="text" maxlength="70" placeholder="例：入庫（仕入先名）">
-    <label for="posCardNo">カード一覧で選ぶ番号</label>
+    <label for="posCardNo">そのカードを選ぶ一覧番号（何番か）</label>
     <input id="posCardNo" type="text" inputmode="numeric" maxlength="5" placeholder="例：2">
-    <p class="caption">この2項目は店舗ごとに保存します。別店舗ではそれぞれのPOS表示に合わせて設定してください。</p>
+    <p class="caption">例：伊都店「入庫（JX日光）」を2番で選択。別店舗では現場のPOS表示を確認してください。</p>
   </fieldset>
   <div id="tankSettings"></div>
   <div class="actions"><button type="button" id="addTank" class="outline">＋ タンクを追加</button><button type="button" id="addStore" class="outline">＋ 別店舗を作る</button></div>

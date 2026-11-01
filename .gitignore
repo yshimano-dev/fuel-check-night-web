@@ -6,3 +6,6 @@ node_modules/
 *.log
 *.json.bak
 credentials*.json
+.wrangler/
+.wrangler-preview/
+worker/.wrangler-preview/

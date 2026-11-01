@@ -100,4 +100,4 @@ function saveCsv(){const rows=[['タンクNo','タンク容量','油種','A','B'
 const csv='\ufeff'+rows.map(row=>row.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='燃料_荷卸し検証_原紙形式.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
 function resetAll(){if(!confirm('この端末の入力数字をすべて消去します。よろしいですか？'))return;tanks=Array.from({length:10},empty);save();load();renderPaper();}
 init();
-</script><script src="./pair-ocr.js"></script><script>window.FUEL_AI_ENDPOINT='';</script><script src="./ai-simple.js"></script></body></html>
+</script><script src="./pair-ocr.js"></script><script src="./vision-layout.js"></script><script>window.FUEL_AI_ENDPOINT='';</script><script src="./ai-simple.js"></script></body></html>

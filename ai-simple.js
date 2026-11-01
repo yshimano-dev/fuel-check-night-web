@@ -23,29 +23,10 @@ const hint=document.createElement('p');hint.className='small';newWrap.after(hint
 if(!endpoint){bNew.hidden=true;hint.textContent='写真は端末内OCRで読み取れます。高精度AIは専用サーバー接続後に利用できます。';}
 else{btn.classList.remove('primary');hint.textContent='AI読取を使うと写真2枚をGoogle Cloud Visionに一時送信します。勤務先の許可を得た帳票だけ利用してください。失敗時は端末内OCRを使えます。';}
 const fresh=document.createElement('button');fresh.className='btn';fresh.type='button';fresh.textContent='新しい荷卸し（入力を消去）';fresh.onclick=()=>resetAll();panel.appendChild(fresh);
-function numbersFromZone(page,x0,y0,x1,y1){
- if(!page||!page.pageWidth||!page.pageHeight||!Array.isArray(page.words))return [];
- const items=page.words.filter(w=>{
-  const x=(w.x+w.width/2)/page.pageWidth,y=(w.y+w.height/2)/page.pageHeight;
-  return x>=x0&&x<=x1&&y>=y0&&y<=y1;
- }).map(w=>({s:String(w.text||'').replace(/[^0-9,.]/g,''),y:w.y})).filter(w=>/^(\d{1,3},)?\d{3}(\.0)?$/.test(w.s)||/^\d{4,5}(\.0)?$/.test(w.s))
- .map(w=>({...w,n:Number(w.s.replace(/,/g,''))})).filter(w=>w.n>=1000&&w.n<100000);
- // Duplicate OCR words or more than four readings = ambiguous; do not fill.
- if(items.length!==4)return [];
- return items.sort((a,b)=>a.y-b.y).map(v=>v.n);
-}
-function candidate(page,field){
- if(field==='A'||field==='C')return numbersFromZone(page,.32,.55,.60,.80);
- return numbersFromZone(page,.68,.67,.95,.91);
-}
+// Only accept candidates aligned with the report template. Ambiguous rows stay blank.
 function draft(before,after){
- const d={H:{},R:{},D:{},K:{}}, oils=['H','R','D','K'];
- for(const [page,key] of [[before,'A'],[before,'B'],[after,'C'],[after,'D']]){
-  const arr=candidate(page,key);
-  if(arr.length===4)for(let i=0;i<4;i++)d[oils[i]][key]=String(arr[i]);
- }
- // Q is deliberately manual: a wrong fuel-delivery amount changes the % test.
- return d;
+ if(!window.FuelLayoutParser)throw Error('AIの帳票解析コードが読み込まれていません');
+ return window.FuelLayoutParser.parse(before,after);
 }
 async function convertImage(file){
  const url=URL.createObjectURL(file);
@@ -78,12 +59,13 @@ bNew.onclick=async()=>{
   }
   sessionStorage.setItem('fuel_shift_code',code);
   if(!Array.isArray(data.results)||data.results.length!==2)throw Error('画像の読み取り結果がありません');
-  const obj=draft(data.results[0],data.results[1]);
-  window.eneosPairTest.loadAiResults(obj);
-  status.textContent='AIの読み取り候補を表示しました。空欄を手入力して20欄すべて原票と照合してください。';
+  const parsed=draft(data.results[0],data.results[1]);
+  window.eneosPairTest.loadAiResults(parsed.drafts);
+  status.textContent='AI候補：5つの項目中'+parsed.completeColumns+'項目を抽出。'+parsed.warnings.join(' ')+' すべての数字を印刷物と照合してください。';
+  if(parsed.warnings.length)document.getElementById('pairCropDetail').open=true;
  }catch(e){
   status.textContent='AIを使用できません：'+e.message+'。端末内OCRか手入力をご利用ください。';
  }finally{bNew.disabled=false}
 };
-window.fuelVisionParserForTests={numbersFromZone,draft};
+window.fuelVisionParserForTests={draft};
 })();

@@ -21,7 +21,7 @@ const panel=`<div class="panel" id="pairPanel">
 <div><label>① 荷卸し前の用紙</label><input id="pairBefore" type="file" accept="image/*" capture="environment"><p id="beforeName" class="micro">未選択</p></div>
 <div><label>② 荷卸し後の用紙</label><input id="pairAfter" type="file" accept="image/*" capture="environment"><p id="afterName" class="micro">未選択</p></div></div>
 <div class="buttons" style="margin-top:10px"><button type="button" class="btn primary" id="pairRun">2枚から数字候補を抽出</button></div>
-<p id="pairStatus" class="status" aria-live="polite">写真を2枚選んでください。撮影データはサーバーに送信しません。</p>
+<p id="pairStatus" class="status" aria-live="polite">写真を2枚選んでください。端末内OCRでは外部送信しません。</p>
 <details id="pairCropDetail"><summary><b>数字の切り出し位置を調整</b>（認識不足の場合）</summary><p class="small">各プレビューに数字4行が入るようにスライダーを調整して再実行します。候補は必ず原票と照合してください。</p><div id="pairCrops"></div></details>
 <div id="pairCandidates" hidden><h3>OCR候補（紙と同じA・B・C・D・④）</h3>
 <p class="cameraHelp">青い欄は仮の候補です。読み取りの弱い欄は空欄になり、自動的に正しい数字が入ったことにはなりません。</p>
@@ -120,5 +120,5 @@ document.getElementById('pairApply').addEventListener('click',()=>{
  for(const [oil,idx,capacity] of order){tanks[idx].oil=oil;tanks[idx].capacity=capacity;for(const k of fields)tanks[idx][k]=normalize(drafts[oil][k])}
  save();changeTank(0);renderPaper();tab('paper');alert('20欄の確認済み数字を計算表に反映しました。紙へ転記する前にも元帳票を確認してください。');
 });
-window.eneosPairTest={parseNumbers,configs,mapIfComplete};
+window.eneosPairTest={parseNumbers,configs,mapIfComplete,loadAiResults:(parsed)=>{for(const [oil] of order){for(const key of fields)drafts[oil][key]=parsed?.[oil]?.[key]===undefined?'':String(parsed[oil][key]);}renderDrafts();status('AI候補を読み込みました。元の印字レシートと20欄をすべて照合してから反映してください。');document.getElementById('pairCandidates').scrollIntoView({behavior:'smooth',block:'start'});}};
 })();

@@ -23,7 +23,7 @@ textarea{height:118px;resize:vertical;font-size:15px;background:#fff}.grid{displ
 </style></head><body>
 <header><h1>荷卸し検証チェック表</h1><p>原紙に合わせた並び｜写真OCR＋手入力修正＋自動判定（非公式補助ツール）</p></header>
 <main>
-<p class="small">写真と数字はサーバーに保存されません。閲覧URL自体は一般公開です。業務上許可された資料のみ使ってください。</p>
+<p class="small">通常の端末内OCRでは写真を外部送信しません。AI読取を利用する場合のみGoogle Cloudへ送信します（AIは現在未接続）。業務上許可された帳票のみ使用してください。</p>
 <div class="notice">最優先：ローリーが到着したら、荷卸し前の油面計「在庫レシート」をすぐに印字。受け入れが終わった後に、もう一度印字。</div>
 <div class="tabs" role="tablist"><button id="t-photo" class="active" onclick="tab('photo')">① 写真</button><button id="t-entry" onclick="tab('entry')">② 入力</button><button id="t-paper" onclick="tab('paper')">③ 原紙形式</button><button id="t-guide" onclick="tab('guide')">手順</button></div>
 <section id="photoView">
@@ -46,7 +46,7 @@ textarea{height:118px;resize:vertical;font-size:15px;background:#fff}.grid{displ
 <div class="buttons"><button class="btn" onclick="saveCsv()">計算結果をCSVで保存</button><button class="btn" onclick="window.print()">表を印刷（任意）</button></div><div class="blockAlert" style="margin-top:12px">正式な紙のチェック表へ手書きし、荷卸し前後の帳票と合わせて3枚1セットで夜勤帯に保存してください。</div><p class="small">○×は計算上の参考判定です。油種の入れ違いが疑われる場合や異常時は、燃料の判断フローと上長の指示に従ってください。</p></div>
 </section>
 <section id="guideView" hidden><div class="panel"><h2>夜勤用操作手順（簡略版）</h2><ol><li><strong class="warn">到着直後、最優先：</strong>油面計の［印刷］→［レシート印字］で荷卸し前の在庫レシートを取る。</li><li>荷卸し前のタンク管理表を準備する（計算在庫A）。</li><li>店舗の正式手順に従い受け入れる。</li><li><strong>受け入れが完了したら：</strong>油面計のレシートをもう一度印字する（実在庫D）。</li><li>荷卸し後のタンク管理表をそろえる（計算在庫C）。</li><li>写真の数字を確認し、誤読は手で修正。入荷数量④を入力する。</li><li>表の①②③・誤差率・判定を元の書類と照合し、紙へ手書きする。</li><li>紙チェック表と前後の帳票を<strong>3枚1セット</strong>で保管する。</li></ol><div class="blockAlert">画像読み取り・電子計算は補助です。数字の確認を省略しないでください。疑義や混油の可能性があれば、現場の判断フローに従い該当油種の販売を停止し、上長へ連絡してください。</div><div class="buttons" style="margin-top:12px"><button class="btn danger" onclick="resetAll()">端末の入力データを消去</button></div></div></section>
-<p class="foot">試験公開版：入力数値はこの端末のブラウザにのみ保存。写真はサーバーへ送信せず画面内で処理。文字認識には外部ライブラリを使用。入力結果は紙と原票で必ず照合してください。</p>
+<p class="foot">試験公開版：入力数値はこの端末のブラウザにのみ保存。端末内OCRでは写真を送信しません。AI読取を有効化した場合はGoogle Cloud Visionへ画像を送ります。結果は必ず原票と照合してください。</p>
 </main><div class="sticky"><button onclick="tab('photo')">📷 写真画面へ</button><button onclick="tab('entry')" class="primary">✎ 数字を修正</button><button onclick="tab('paper')">☷ 紙と同じ表</button></div>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <script>
@@ -100,4 +100,4 @@ function saveCsv(){const rows=[['タンクNo','タンク容量','油種','A','B'
 const csv='\ufeff'+rows.map(row=>row.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='燃料_荷卸し検証_原紙形式.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
 function resetAll(){if(!confirm('この端末の入力数字をすべて消去します。よろしいですか？'))return;tanks=Array.from({length:10},empty);save();load();renderPaper();}
 init();
-</script><script src="./pair-ocr.js"></script></body></html>
+</script><script src="./pair-ocr.js"></script><script>window.FUEL_AI_ENDPOINT='';</script><script src="./ai-simple.js"></script></body></html>

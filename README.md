@@ -12,6 +12,8 @@ LINEから開く静的Webアプリ: https://yshimano-dev.github.io/fuel-check-ni
 - GitHub Pagesで静的公開。写真・帳票・実例は公開リポジトリに含めない。
 - 従来の端末内OCR（Tesseract.js）は写真を外部送信しない。
 - 高精度AI用のCloudflare WorkerとCloud Vision OCRの接続コードは worker/ に準備済み。
+- Google Cloud専用プロジェクト `fuel-check-night-20261102` を作成済み。Cloud Vision API は有効化済み。2026-11-02 時点で課金設定は無効のまま（既存請求先を無断で紐づけない）。
+- Cloudflare Wrangler は未ログイン。Worker本番公開と API キー設定は未実施。
 - Cloud Vision AIはまだ未接続。worker APIURLが未設定なので、公開WebページからGoogleへ写真を送らない。
 - AI接続後はAIボタンで撮影画像のみCloud Visionに一時送信、Google公式仕様はオンライン処理では画像をディスクに保存しない。
 - 6桁の夜勤共通コード（Workers Secret）で認証。ユーザー全員が個別AI登録する必要はない。

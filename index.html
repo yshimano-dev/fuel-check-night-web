@@ -1,116 +1,94 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>燃料荷卸し検証補助｜写真と手入力</title>
-<style>
-:root{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;color:#142438;background:#f4f7fa}
-*{box-sizing:border-box} body{margin:0;font-size:16px;line-height:1.48}button,input,select,textarea{font:inherit}button,select{cursor:pointer}
-header{background:#123d56;color:#fff;padding:15px 17px 18px}header h1{font-size:20px;line-height:1.4;margin:0 0 4px}header p{margin:0;font-size:12px;color:#d3e5ef}
-main{max-width:1080px;margin:0 auto;padding:12px 12px 105px}.notice{background:#fff5eb;border-left:4px solid #d97706;color:#653b0a;border-radius:7px;margin-bottom:12px;padding:11px 12px;font-weight:700;font-size:14px}
-.tabs{display:flex;gap:4px;padding:5px;background:#e4ebf2;border-radius:12px;margin-bottom:12px;position:sticky;top:0;z-index:8;box-shadow:0 2px 5px #21364b12}.tabs button{flex:1;border:0;border-radius:8px;padding:11px 4px;background:none;color:#40556a;font-size:13px;font-weight:700}.tabs button.active{background:white;color:#0f4d80;box-shadow:0 1px 4px #223a4b20}
-section[hidden]{display:none!important}.panel{background:white;border:1px solid #d8e3eb;border-radius:12px;padding:15px;margin-bottom:13px;box-shadow:0 1px 4px #192d4010}
-h2{font-size:17px;margin:0 0 9px;color:#163b57}h3{font-size:15px;margin:0 0 6px}p{margin:8px 0}.small{color:#627287;font-size:13px}.micro{font-size:12px;color:#68798b}.warn{color:#a32323;font-weight:700}.mark{display:inline-block;background:#dcecf8;padding:2px 7px;border-radius:5px;font-size:12px;color:#184f76}
-label{display:block;font-weight:700;font-size:13px;color:#30435a;margin-bottom:5px}.field{min-width:0}.field input,.field select,textarea{width:100%;height:45px;border:1px solid #bbcbd7;border-radius:9px;padding:8px 9px;color:#1a2d41;background:#fff;font-size:16px}.field input:focus,.field select:focus,textarea:focus{outline:2px solid #7bb8e2;outline-offset:0}.field input{background:#ecf6ff}
-textarea{height:118px;resize:vertical;font-size:15px;background:#fff}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.group{border:1px solid #b8cfde;border-radius:12px;padding:12px;margin-top:14px}.group .groupTitle{font-weight:800;color:#154f71;border-bottom:1px solid #cee0eb;padding:0 0 7px;margin-bottom:11px}
-.btn{border:1px solid #bed0db;background:#f5f9fc;color:#17445e;border-radius:9px;padding:11px 14px;font-weight:700;font-size:14px;text-align:center;text-decoration:none;display:inline-block}.btn.primary{background:#0f618e;border-color:#0f618e;color:white}.btn.danger{color:#a11f1f}.buttons{display:flex;gap:8px;flex-wrap:wrap}.buttons>*{flex:1;min-width:120px}.status{font-size:13px;color:#607186}.blockAlert{background:#fff0f0;border:1px solid #eccaca;padding:10px;border-radius:9px;color:#8b1e1e;font-weight:700;font-size:13px}
-.step{padding:13px 0;border-bottom:1px solid #e5ecf2}.step:last-child{border-bottom:0}.step b{font-size:15px}.step .buttons{margin-top:9px}.cameraInputs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.captureBlock{min-width:0;border:1px solid #bdd3e1;border-radius:10px;padding:10px;background:#f3f9fe}.captureBlock strong{display:block;font-size:14px;margin-bottom:7px;color:#17445e}.photoFile{display:block;width:100%;max-width:100%;font-size:14px;padding:8px;border:1px solid #a5c3d5;border-radius:8px;background:white;min-height:44px}.cameraHelp{padding:9px 10px;background:#fff8e8;border-left:3px solid #d49a27;color:#72521b;border-radius:6px;margin:7px 0;font-size:13px}.photoPreview{width:100%;max-height:240px;object-fit:contain;border-radius:8px;background:#f0f4f7;margin-top:8px}.tokens{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.tokens button{background:#fff;border:1px solid #9fc3dc;border-radius:8px;padding:7px 10px;font-weight:700;color:#164d76}.two{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.paperWrap{overflow:auto;width:100%;-webkit-overflow-scrolling:touch;border:1px solid #8296a7;border-radius:8px;background:white}.paper{border-collapse:collapse;background:white;table-layout:fixed;min-width:1560px;width:100%;font-size:12px}.paper th,.paper td{border:1px solid #788896;text-align:center;padding:6px 4px;white-space:nowrap}.paper th{white-space:normal;line-height:1.3;font-weight:800;background:#edf2f5}.paper tbody tr{height:38px;cursor:pointer}.paper tbody tr:nth-child(even){background:#f8fafb}.paper td:first-child{font-weight:800}.paper td.editable{background:#e7f3ff}.paper td.formula{background:#f1f5f7}.paper td.bad{color:#b42318;font-weight:800;background:#fee6e6}.paper td.pending{color:#8796a2}.paper .min{min-width:52px}.paper th:nth-child(1),.paper td:nth-child(1){position:sticky;left:0;background:#e8eff5;z-index:2}.paper td:nth-child(1){background:#fff}.paper tbody tr:nth-child(even) td:nth-child(1){background:#f8fafb}
-.legend{display:flex;gap:11px;align-items:center;font-size:12px;margin:10px 0 5px;color:#596b7b}.swatch{width:12px;height:12px;display:inline-block;background:#e7f3ff;border:1px solid #abc7df;margin-right:3px}.swatch.gray{background:#f1f5f7}
-.summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:11px}.summary .metric{background:#edf5fa;border-radius:10px;padding:9px 10px}.summary .metric strong{font-size:19px;display:block;color:#15496c}.summary .metric span{font-size:12px;color:#526779}.summary .metric.bad{background:#fce9e9}.summary .metric.bad strong{color:#b42318}
-.mobileRows{display:none}.minirow{border:1px solid #cbd7e2;border-radius:10px;margin-bottom:10px;padding:11px 12px;background:#fff}.minihead{display:flex;justify-content:space-between;align-items:center;font-weight:800}.miniValues{font-size:13px;color:#4e6172;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 12px;margin-top:8px}.miniValues b{color:#142438}.ministatus{font-weight:800;border-radius:5px;padding:3px 7px;background:#e8f0f6}.ministatus.bad{background:#fee4e4;color:#b42318}.badge{display:inline-block;background:#eff6fc;color:#235879;border-radius:6px;font-size:12px;font-weight:800;padding:4px 7px}
-#paperView .panel{padding:12px}ol{padding-left:23px}li{margin-bottom:10px}.foot{font-size:12px;color:#607283;text-align:center;padding:16px}.sticky{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #dce5ec;display:flex;gap:8px;padding:9px 12px calc(9px + env(safe-area-inset-bottom));z-index:10}.sticky button{flex:1;min-width:0;border-radius:9px;border:1px solid #a9c7dc;background:#edf7ff;color:#174967;padding:11px 4px;font-weight:800;font-size:13px}.sticky button.primary{background:#075f8d;color:white}
-@media(max-width:460px){.cameraInputs{grid-template-columns:1fr}main{padding:8px 8px 95px} .panel{padding:12px}.tabs button{font-size:12px;padding:10px 2px}.paper{min-width:1520px}.mobileRows{display:block}.grid{gap:10px}.notice{font-size:13px}}
-@media print{.tabs,.sticky,.notice,.buttons,.mobileRows,.panel:not(.printable){display:none!important}header{color:#000;background:#fff}main{max-width:none} .paperWrap{overflow:visible;border:none}.paper{min-width:0;font-size:9px}}
-/* Exact form input colors: A blue, B green, C orange, D pink, intake ④ purple. */
-#A{background:#dfedff;border:2px solid #2776d7}#B{background:#e1f8e8;border:2px solid #26964b}
-#C{background:#fff0df;border:2px solid #e27822}#D{background:#ffe5f1;border:2px solid #e04695}
-#Q{background:#ede4ff;border:2px solid #7443c6}
-#capacity[readonly],#oil:disabled{background:#f2f5f8;color:#253d54;opacity:1}
-.paper td:nth-child(4),.paper th:nth-child(4){background:#dfedff}
-.paper td:nth-child(5),.paper th:nth-child(5){background:#e1f8e8}
-.paper td:nth-child(7),.paper th:nth-child(7){background:#fff0df}
-.paper td:nth-child(8),.paper th:nth-child(8){background:#ffe5f1}
-.paper td:nth-child(14),.paper th:nth-child(14){background:#ede4ff}
-</style></head><body>
-<header><h1>荷卸し検証チェック表</h1><p>原紙に合わせた並び｜写真OCR＋手入力修正＋自動判定（非公式補助ツール）</p></header>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123d56">
+<title>荷卸し検証｜手入力・自動判定</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="top">
+ <div class="top-inner">
+  <h1>荷卸し検証チェック</h1>
+  <p>手入力専用｜数字を入れるだけで自動計算</p>
+ </div>
+</header>
 <main>
-<p class="small">通常の端末内OCRでは写真を外部送信しません。AI読取を利用する場合のみGoogle Cloudへ送信します（AIは現在未接続）。業務上許可された帳票のみ使用してください。</p>
-<div class="notice">最優先：ローリーが到着したら、荷卸し前の油面計「在庫レシート」をすぐに印字。受け入れが終わった後に、もう一度印字。</div>
-<div class="tabs" role="tablist"><button id="t-photo" class="active" onclick="tab('photo')">① 写真</button><button id="t-entry" onclick="tab('entry')">② 入力</button><button id="t-paper" onclick="tab('paper')">③ 原紙形式</button><button id="t-guide" onclick="tab('guide')">手順</button></div>
-<section id="photoView">
-<div class="panel"><h2>帳票を撮影して数字を拾う</h2><p class="cameraHelp">※ LINE内でカメラが開かなければ、右上のメニューからSafariで開いてください。「保存した写真を選ぶ」からの読み込みもできます。</p><p class="small">写真の文字認識は数字の候補表示です。タンク番号と対象欄を自分で選び、必ず元の印刷物と照合してください。誤読した数字は「② 入力」で修正できます。</p><div id="photoSteps"></div></div>
-<div class="panel" id="ocrPanel"><h2>認識した数字を確定</h2><div class="two"><div class="field"><label for="ocrTank">タンクNo.</label><select id="ocrTank"></select></div><div class="field"><label for="ocrField">記入する欄</label><select id="ocrField"><option value="A">荷卸し前 A（計算在庫）</option><option value="B">荷卸し前 B（実在庫）</option><option value="C">荷卸し後 C（計算在庫）</option><option value="D">荷卸し後 D（実在庫）</option><option value="Q">今回入荷数量④</option></select></div></div><p id="ocrStatus" class="status">写真を選ぶとここに数字候補が出ます。</p><textarea id="ocrText" placeholder="写真からの認識結果。ここにコピーした数字を貼ってもOKです。" aria-label="OCR文字"></textarea><div class="buttons" style="margin-top:8px"><button class="btn" onclick="extract()">テキストから数字候補を抽出</button></div><div id="tokens" class="tokens"></div><div class="two" style="margin-top:13px"><div class="field"><label for="manualValue">候補がなければ直接入力</label><input id="manualValue" inputmode="decimal" placeholder="例 7,830"></div><div style="display:flex;align-items:end"><button class="btn primary" onclick="assignManual()" style="width:100%">指定欄へ入力</button></div></div></div>
-</section>
-<section id="entryView" hidden>
-<div class="panel"><h2>紙と同じ順番で入力・修正</h2><p class="small">タンク1＝H（14KL）、2＝R（48KL）、3＝D（14KL）、10＝K（20KL）は固定です。4〜9は空欄のまま使用します。タンク管理表・在庫レシートでは灯油が4行目ですが、チェック表は10番Kに転記してください。</p><p class="cameraHelp">入力するのは色付きの A（青）・B（緑）・C（オレンジ）・D（ピンク）・④（紫）の5欄だけ。①②③・誤差率・○×は自動計算します。</p><div class="field"><label for="tank">タンクNo.</label><select id="tank" onchange="changeTank(this.value)"></select></div><div class="grid" style="margin-top:11px"><div class="field"><label for="capacity">タンク容量</label><input id="capacity" placeholder="例 14KL" oninput="set('capacity',this.value)"></div><div class="field"><label for="oil">油種</label><select id="oil" onchange="set('oil',this.value)"><option value="">選択</option><option value="H">H ハイオク</option><option value="R">R レギュラー</option><option value="D">D 軽油</option><option value="K">K 灯油</option></select></div></div>
-<div class="group"><div class="groupTitle">荷卸し前（前尺誤差）</div><div class="grid"><div class="field"><label for="A">計算在庫 A（L）</label><input id="A" inputmode="decimal" oninput="set('A',this.value)" placeholder="タンク管理表"></div><div class="field"><label for="B">実在庫 B（L）</label><input id="B" inputmode="decimal" oninput="set('B',this.value)" placeholder="在庫レシート"></div></div><p class="small">① 誤差 B−A：<strong id="n1">—</strong></p></div>
-<div class="group"><div class="groupTitle">荷卸し後（後尺誤差）</div><div class="grid"><div class="field"><label for="C">計算在庫 C（L）</label><input id="C" inputmode="decimal" oninput="set('C',this.value)" placeholder="タンク管理表"></div><div class="field"><label for="D">実在庫 D（L）</label><input id="D" inputmode="decimal" oninput="set('D',this.value)" placeholder="在庫レシート"></div></div><p class="small">② 誤差 D−C：<strong id="n2">—</strong></p></div>
-<div class="group"><div class="groupTitle">今回入荷数量 ④</div><div class="field"><label for="Q">今回入荷数量（L）</label><input id="Q" inputmode="decimal" oninput="set('Q',this.value)" placeholder="入荷した実際の数量"></div><div id="live" class="summary"></div></div>
-<div class="buttons" style="margin-top:12px"><button class="btn" onclick="changeTank(Math.max(0,index-1))">← 前のタンク</button><button class="btn primary" onclick="changeTank(Math.min(9,index+1))">次のタンク →</button></div><p class="small">判定：H・R・Dは誤差量400L以上または誤差率2.5%以上で「×」。Kは誤差量100L以上または誤差率2.5%以上で「×」。いずれも絶対値で判断。④＝0なら誤差率は算出しませんが、数量基準を超えた場合は×にします。</p><p class="small">スマホの「③ 原紙形式」で紙と同じ並びの表を見られます。</p></div>
-</section>
-<section id="paperView" hidden><div class="panel printable"><h2>荷卸し検証チェック表（原紙形式）</h2><p class="small">実物の用紙と同じ並びです。表は左右にスクロールできます。行をタップするとタンクごとの編集画面が開きます。</p><div class="legend"><span><i class="swatch"></i>入力する欄</span><span><i class="swatch gray"></i>自動計算</span><span style="color:#b42318;font-weight:700">赤：基準超過</span></div>
-<div class="paperWrap"><table class="paper" id="paperTable"><colgroup><col style="width:56px"><col style="width:65px"><col style="width:49px"><col style="width:116px"><col style="width:116px"><col style="width:102px"><col style="width:116px"><col style="width:116px"><col style="width:102px"><col style="width:105px"><col style="width:82px"><col style="width:170px"><col style="width:70px"><col style="width:104px"></colgroup><thead>
-<tr><th rowspan="3">タンク<br>No.</th><th rowspan="3">タンク<br>容量</th><th rowspan="3">油種</th><th colspan="6">タンク管理誤差（タンク管理表・油面計在庫レシートより転記）</th><th rowspan="3">誤差数量<br>（L）<br>②−①＝③</th><th rowspan="3">誤差率<br>③÷④</th><th rowspan="3">許容範囲</th><th rowspan="3">判定</th><th rowspan="3">今回入荷<br>数量（L）<br>④</th></tr>
-<tr><th colspan="3">荷卸し前（前尺誤差）</th><th colspan="3">荷卸し後（後尺誤差）</th></tr>
-<tr><th>計算在庫<br>タンク管理 A</th><th>実在庫<br>レシート B</th><th>誤差<br>B−A＝①</th><th>計算在庫<br>タンク管理 C</th><th>実在庫<br>レシート D</th><th>誤差<br>D−C＝②</th></tr></thead><tbody></tbody></table></div>
-<div id="compact" class="mobileRows" style="margin-top:14px"></div>
-<div class="buttons"><button class="btn" onclick="saveCsv()">計算結果をCSVで保存</button><button class="btn" onclick="window.print()">表を印刷（任意）</button></div><div class="blockAlert" style="margin-top:12px">正式な紙のチェック表へ手書きし、荷卸し前後の帳票と合わせて3枚1セットで夜勤帯に保存してください。</div><p class="small">○×は計算上の参考判定です。油種の入れ違いが疑われる場合や異常時は、燃料の判断フローと上長の指示に従ってください。</p></div>
-</section>
-<section id="guideView" hidden><div class="panel"><h2>夜勤用操作手順（簡略版）</h2><ol><li><strong class="warn">到着直後、最優先：</strong>油面計の［印刷］→［レシート印字］で荷卸し前の在庫レシートを取る。</li><li>荷卸し前のタンク管理表を準備する（計算在庫A）。</li><li>店舗の正式手順に従い受け入れる。</li><li><strong>受け入れが完了したら：</strong>油面計のレシートをもう一度印字する（実在庫D）。</li><li>荷卸し後のタンク管理表をそろえる（計算在庫C）。</li><li>写真の数字を確認し、誤読は手で修正。入荷数量④を入力する。</li><li>表の①②③・誤差率・判定を元の書類と照合し、紙へ手書きする。</li><li>紙チェック表と前後の帳票を<strong>3枚1セット</strong>で保管する。</li></ol><div class="blockAlert">画像読み取り・電子計算は補助です。数字の確認を省略しないでください。疑義や混油の可能性があれば、現場の判断フローに従い該当油種の販売を停止し、上長へ連絡してください。</div><div class="buttons" style="margin-top:12px"><button class="btn danger" onclick="resetAll()">端末の入力データを消去</button></div></div></section>
-<p class="foot">試験公開版：入力数値はこの端末のブラウザにのみ保存。端末内OCRでは写真を送信しません。AI読取を有効化した場合はGoogle Cloud Visionへ画像を送ります。結果は必ず原票と照合してください。</p>
-</main><div class="sticky"><button onclick="tab('photo')">📷 写真画面へ</button><button onclick="tab('entry')" class="primary">✎ 数字を修正</button><button onclick="tab('paper')">☷ 紙と同じ表</button></div>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
-<script>
-'use strict';
-const photos=[
- {id:'beforeReceipt',title:'1．ローリー到着直後：荷卸し前の在庫レシート',field:'B',urgent:true,detail:'最優先で印字する。荷卸し前の実在庫Bに使用。'},
- {id:'beforeReport',title:'2．荷卸し前のタンク管理表',field:'A',detail:'荷卸し前の計算在庫Aに使用。'},
- {id:'afterReceipt',title:'3．受け入れ完了後：在庫レシートを再印字',field:'D',urgent:true,detail:'受け入れ後に2回目の印字。荷卸し後の実在庫Dに使用。'},
- {id:'afterReport',title:'4．荷卸し後のタンク管理表',field:'C',detail:'荷卸し後の計算在庫Cに使用。'}
-];
-const empty=()=>({capacity:'',oil:'',A:'',B:'',C:'',D:'',Q:''});
-// Correct ENEPIS-POS form layout: No.1=H, No.2=R, No.3=D, No.10=K.
-const FIXED_TANKS={0:{capacity:'14KL',oil:'H'},1:{capacity:'48KL',oil:'R'},2:{capacity:'14KL',oil:'D'},9:{capacity:'20KL',oil:'K'}};
-const defaultTanks=()=>Array.from({length:10},(_,i)=>({...empty(),...(FIXED_TANKS[i]||{})}));
-const KEY='fuel-check-paper-v2-correct-fuels';
-let tanks=[];let index=0;let worker=null;
-try{let d=JSON.parse(localStorage.getItem(KEY));if(!Array.isArray(d)||d.length!==10){d=defaultTanks()}tanks=d.map((t,i)=>({...empty(),...t,...(FIXED_TANKS[i]||{})}));}catch(e){tanks=defaultTanks()}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(tanks))}catch(e){}}
-function tab(name){for(const key of ['photo','entry','paper','guide']){document.getElementById(key+'View').hidden=key!==name;document.getElementById('t-'+key).classList.toggle('active',name===key)}if(name==='paper')renderPaper();scrollTo({top:0,behavior:'smooth'});}
-function normalize(value){return String(value??'').replace(/[,，\s]/g,'').trim()}
-function valid(v){return normalize(v)!==''&&Number.isFinite(Number(normalize(v)))}
-function number(v){return Number(normalize(v))}
-function f(v){return v===undefined||v===null||v===''?'—':Number(v).toLocaleString('ja-JP',{maximumFractionDigits:2})}
-function inputDisplay(v){return v===''?'—':v}
-function calc(t){const one=valid(t.A)&&valid(t.B)?number(t.B)-number(t.A):null;
-const two=valid(t.C)&&valid(t.D)?number(t.D)-number(t.C):null;
-const three=one!==null&&two!==null?two-one:null;
-const q=valid(t.Q)?number(t.Q):null;
-const rate=three!==null&&q!==null&&q>0?three/q:null;
-const lim=t.oil==='K'?100:400;
-const complete=!!t.oil&&one!==null&&two!==null&&q!==null&&q>=0;
-const noDelivery=complete&&q===0;
-const ready=complete&&q>0&&rate!==null;
-const bad=(ready&&(Math.abs(three)>=lim||Math.abs(rate)>=0.025))||(noDelivery&&Math.abs(three)>=lim);
-return {one,two,three,q,rate,lim,ready,bad,state:!t.oil?'—':!complete?'要入力':noDelivery?(bad?'×':'—'):bad?'×':'○'};
-}
-function init(){document.getElementById('photoSteps').innerHTML=photos.map(p=>`<div class="step"><b>${p.title}</b>${p.urgent?'<span class="badge" style="margin-left:8px;background:#fde8e8;color:#a32323">印刷のタイミング重要</span>':''}<p class="small">${p.detail}</p><div class="cameraInputs"><div class="captureBlock"><strong>📷 今からカメラで撮る</strong><input id="p-${p.id}" class="photoFile" type="file" accept="image/*" capture="environment" aria-label="${p.title}をカメラ撮影" onchange="choose('${p.id}',this)" /></div><div class="captureBlock"><strong>🖼 保存した写真を選ぶ</strong><input id="pick-${p.id}" class="photoFile" type="file" accept="image/*" aria-label="${p.title}の写真を選ぶ" onchange="choose('${p.id}',this)" /></div></div><div class="buttons"><button type="button" class="btn" onclick="ocr('${p.id}')">選んだ写真の数字を読み取る</button></div><div id="prev-${p.id}"></div><p id="stat-${p.id}" class="status">写真未選択</p></div>`).join('');
-const options=Array.from({length:10},(_,i)=>`<option value="${i}">タンク ${i+1}${FIXED_TANKS[i]?'（'+FIXED_TANKS[i].oil+' / '+FIXED_TANKS[i].capacity+'）':''}</option>`).join('');document.getElementById('tank').innerHTML=options;document.getElementById('ocrTank').innerHTML=options;load();renderPaper();tab('entry');}
-let urls={};let selectedPhotos={};function choose(id,input){if(!input.files?.[0])return;selectedPhotos[id]=input.files[0];const el=document.getElementById('prev-'+id);if(urls[id])URL.revokeObjectURL(urls[id]);urls[id]=URL.createObjectURL(input.files[0]);el.innerHTML=`<img class="photoPreview" alt="撮影した帳票">`;el.querySelector('img').src=urls[id];document.getElementById('stat-'+id).textContent='選択済み。数字を読み取るを押してください。';}
-async function toCanvas(file){const url=URL.createObjectURL(file);try{return await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{const scale=Math.min(1,1800/Math.max(im.width,im.height));const cvs=document.createElement('canvas');cvs.width=Math.max(1,Math.round(im.width*scale));cvs.height=Math.max(1,Math.round(im.height*scale));cvs.getContext('2d',{willReadFrequently:true}).drawImage(im,0,0,cvs.width,cvs.height);resolve(cvs)};im.onerror=reject;im.src=url})}finally{setTimeout(()=>URL.revokeObjectURL(url),1000)}}
-async function ocr(id){const file=selectedPhotos[id];if(!file){alert('先にカメラで撮影するか、保存済みの写真を選んでください');return}const status=document.getElementById('ocrStatus');document.getElementById('ocrField').value=photos.find(x=>x.id===id).field;status.textContent='数字を読み取り中…';try{if(!window.Tesseract)throw new Error('文字認識ライブラリが読み込まれていません');if(!worker){worker=await Tesseract.createWorker('eng',1,{logger:m=>{if(m.status==='recognizing text')status.textContent='認識中 '+Math.round(m.progress*100)+'%';}});await worker.setParameters({tessedit_char_whitelist:'0123456789.,- ',preserve_interword_spaces:'1'});}const cvs=await toCanvas(file);const {data}=await worker.recognize(cvs);document.getElementById('ocrText').value=data.text||'';extract();document.getElementById('stat-'+id).textContent='認識完了。元のレシートを見ながら該当する数字を選択。';document.getElementById('ocrPanel').scrollIntoView({behavior:'smooth'});}catch(e){status.textContent='文字認識に失敗しました。写真の数字を手で入力するか、iPhoneの写真のテキスト認識を使ってください。';document.getElementById('stat-'+id).textContent='OCR失敗：'+e.message;}}
-function extract(){const text=document.getElementById('ocrText').value;const found=text.match(/[-+]?\d{1,3}(?:,\d{3})+(?:\.\d+)?|[-+]?\d+(?:\.\d+)?/g)||[];const vals=[...new Set(found.map(normalize))].filter(valid).slice(0,100);const holder=document.getElementById('tokens');holder.replaceChildren();for(const x of vals){const b=document.createElement('button');b.textContent=f(number(x));b.onclick=()=>assign(x);holder.appendChild(b)}document.getElementById('ocrStatus').textContent=vals.length?`数字候補 ${vals.length}個。タンクと欄を確認し、該当数字を選択してください。`:'数字候補なし。手入力できます。';}
-function assign(v){const tank=Number(document.getElementById('ocrTank').value),field=document.getElementById('ocrField').value;const parsed=normalize(v);if(!valid(parsed)){alert('数字を確認してください');return}tanks[tank][field]=parsed;save();index=tank;load();document.getElementById('ocrStatus').textContent=`タンク${tank+1}の ${field} 欄に「${f(number(parsed))}」を入力しました。必ず元帳票と照合してください。`;}
-function assignManual(){assign(document.getElementById('manualValue').value)}
-function changeTank(i){index=Math.max(0,Math.min(9,Number(i)));load();}
-function set(k,v){if(FIXED_TANKS[index]&&(k==='oil'||k==='capacity'))return;tanks[index][k]=v;save();refresh();}
-function load(){document.getElementById('tank').value=index;for(const k of ['capacity','oil','A','B','C','D','Q'])document.getElementById(k).value=tanks[index][k]??'';document.getElementById('capacity').readOnly=!!FIXED_TANKS[index];document.getElementById('oil').disabled=!!FIXED_TANKS[index];refresh();}
-function refresh(){const r=calc(tanks[index]);document.getElementById('n1').textContent=r.one===null?'—':f(r.one)+' L';document.getElementById('n2').textContent=r.two===null?'—':f(r.two)+' L';document.getElementById('live').innerHTML=`<div class="metric ${r.bad?'bad':''}"><span>③ 誤差数量</span><strong>${r.three===null?'—':f(r.three)+' L'}</strong></div><div class="metric ${r.bad?'bad':''}"><span>誤差率 ③÷④</span><strong>${r.rate===null?'—':(r.rate*100).toFixed(2)+'%'}</strong></div><div class="metric ${r.bad?'bad':''}"><span>○×判定</span><strong>${r.state}</strong></div><div class="metric"><span>数量基準</span><strong>${tanks[index].oil?(r.lim+' L'):'—'}</strong></div>`;}
-function editRow(i){changeTank(i);tab('entry')}
-function renderPaper(){let body='',cards='';for(let i=0;i<10;i++){const t=tanks[i],r=calc(t),cls=r.bad?'bad':'', formula=n=>n===null?'—':f(n), oil=t.oil||'—';const columns=[String(i+1),t.capacity||'—',oil,inputDisplay(t.A),inputDisplay(t.B),formula(r.one),inputDisplay(t.C),inputDisplay(t.D),formula(r.two),formula(r.three),r.rate===null?'—':(r.rate*100).toFixed(2)+'%',t.oil?('±'+r.lim+'L または ±2.5%'):'—',r.state,inputDisplay(t.Q)];const eSet=new Set([3,4,6,7,13]);const cSet=new Set([5,8,9,10,11,12]);body+=`<tr onclick="editRow(${i})">`+columns.map((v,c)=>`<td class="${c===12&&r.bad?'bad':eSet.has(c)?'editable':cSet.has(c)?'formula':''} ${v==='—'?'pending':''}">${String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</td>`).join('')+'</tr>';
-cards+=`<div class="minirow" onclick="editRow(${i})"><div class="minihead"><span>タンク ${i+1}　${t.capacity||'容量未入力'}　${oil}</span><span class="ministatus ${cls}">判定 ${r.state}</span></div><div class="miniValues"><div>前 A：<b>${inputDisplay(t.A)}</b></div><div>前 B：<b>${inputDisplay(t.B)}</b></div><div>① B−A：<b>${formula(r.one)}</b></div><div>後 C：<b>${inputDisplay(t.C)}</b></div><div>後 D：<b>${inputDisplay(t.D)}</b></div><div>② D−C：<b>${formula(r.two)}</b></div><div>③ ②−①：<b>${formula(r.three)}</b></div><div>④ 入荷：<b>${inputDisplay(t.Q)}</b></div><div>誤差率：<b>${r.rate===null?'—':(r.rate*100).toFixed(2)+'%'}</b></div><div>基準：<b>${t.oil?'±'+r.lim+'L / ±2.5%':'—'}</b></div></div></div>`;}
-document.querySelector('#paperTable tbody').innerHTML=body;document.getElementById('compact').innerHTML='<h3>タンクごとの転記表示（スマホ用）</h3>'+cards;}
-function saveCsv(){const rows=[['タンクNo','タンク容量','油種','A','B','① B-A','C','D','② D-C','③ ②-①','誤差率','許容範囲L','判定','④ 入荷数量']];for(let i=0;i<10;i++){const t=tanks[i],r=calc(t);rows.push([i+1,t.capacity,t.oil,t.A,t.B,r.one??'',t.C,t.D,r.two??'',r.three??'',r.rate===null?'':(r.rate*100).toFixed(2)+'%',t.oil?r.lim:'',r.state,t.Q]);}
-const csv='\ufeff'+rows.map(row=>row.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='燃料_荷卸し検証_原紙形式.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
-function resetAll(){if(!confirm('この端末の入力数字をすべて消去します。よろしいですか？'))return;tanks=defaultTanks();save();load();renderPaper();}
-init();
-</script><script src="./pair-ocr.js"></script><script src="./vision-layout.js"></script><script>window.FUEL_AI_ENDPOINT='';</script><script src="./ai-simple.js"></script></body></html>
+ <div class="urgent"><strong>最優先：</strong>ローリー到着直後に荷卸し前の在庫レシートを印字。受け入れ完了後にもう一度印字。</div>
+ <div id="oldData" class="old-data" hidden>前回の入力数値が残っています。今回の作業なら <button type="button" id="newTop">新しい検証を始める</button> を押してください。</div>
+ <nav class="tabs" aria-label="画面切り替え">
+  <button type="button" id="tab-entry" class="active" aria-current="page">① 数字入力</button>
+  <button type="button" id="tab-paper">② 紙へ転記</button>
+  <button type="button" id="tab-guide">使い方</button>
+ </nav>
+ <section id="entryView">
+  <div class="card intro">
+   <div class="section-head"><h2>帳票を見ながら順番に入力</h2><span id="progress" class="progress">0 / 20欄</span></div>
+   <p>油種・タンク番号・容量は設定済み。<strong>入力するのは数字だけ</strong>です。タンク1＝H、2＝R、3＝D、10＝K。</p>
+   <p class="subnote">入力欄を押すとスマホの数字キーボードが開きます。入力した数字はこの端末に一時保存されます。</p>
+  </div>
+  <div class="stage-list" id="stageNav" aria-label="入力する帳票を選ぶ"></div>
+  <div class="card stage-card" id="stageCard">
+   <div class="stage-title">
+    <span id="stageTag" class="stage-tag">A</span>
+    <div><h2 id="stageTitle">荷卸し前の計算在庫</h2><p id="stageSource">荷卸し前タンク管理表</p></div>
+   </div>
+   <div class="source-note" id="stageHint"></div>
+   <div class="inputs" id="stageInputs"></div>
+   <div class="nav-actions">
+    <button type="button" id="prevStage" class="secondary">← 前の帳票</button>
+    <button type="button" id="nextStage" class="primary">次の帳票 →</button>
+   </div>
+  </div>
+  <p class="save-note">※ 数字の読み違いがないか、元の印刷物と照合してください。電子計算だけで正式な検証は完了しません。</p>
+ </section>
+ <section id="paperView" hidden>
+  <div class="card">
+   <div class="section-head"><h2>荷卸し検証チェック表</h2><span id="judgementSummary" class="summary-count"></span></div>
+   <p class="small">原紙と同じ並び。<strong>左右にスクロール</strong>して確認できます。行を押すと、そのタンクの入力欄に戻ります。</p>
+   <div class="legend">
+    <span><b class="color-dot a"></b>A 前計算</span><span><b class="color-dot b"></b>B 前実在庫</span><span><b class="color-dot c"></b>C 後計算</span><span><b class="color-dot d"></b>D 後実在庫</span><span><b class="color-dot q"></b>④ 入荷量</span>
+   </div>
+   <div class="table-wrap">
+    <table class="paper" aria-label="荷卸し検証チェック表">
+     <thead>
+      <tr><th rowspan="3">タンク<br>No.</th><th rowspan="3">タンク<br>容量</th><th rowspan="3">油種</th><th colspan="3">荷卸し前（L）</th><th colspan="3">荷卸し後（L）</th><th rowspan="3">誤差数量<br>③</th><th rowspan="3">誤差率<br>③÷④</th><th rowspan="3">許容範囲</th><th rowspan="3">判定</th><th rowspan="3">今回入荷数量<br>④</th></tr>
+      <tr><th colspan="3">前尺誤差</th><th colspan="3">後尺誤差</th></tr>
+      <tr><th class="source-a">計算在庫<br>A</th><th class="source-b">実在庫<br>B</th><th>誤差<br>B−A＝①</th><th class="source-c">計算在庫<br>C</th><th class="source-d">実在庫<br>D</th><th>誤差<br>D−C＝②</th></tr>
+     </thead>
+     <tbody id="paperBody"></tbody>
+    </table>
+   </div>
+   <div id="mobilePaper" class="paper-cards"></div>
+   <div class="warn">「×」や「要確認」が出た場合は現場の判断フローと上長の指示に従ってください。最終的に紙の検証チェック表へ記入し、前後の帳票と3枚1セットで保存します。</div>
+  </div>
+ </section>
+ <section id="guideView" hidden>
+  <div class="card">
+   <h2>入力の順番</h2>
+   <ol class="guide-steps">
+    <li><strong>ローリー到着したら最優先</strong>で油面計の荷卸し前レシートを印字。</li>
+    <li><strong>青 A：</strong>荷卸し前「タンク管理表」の計算在庫。</li>
+    <li><strong>緑 B：</strong>荷卸し前「在庫レシート」の実在庫。</li>
+    <li>受け入れ完了後に<strong>もう一度在庫レシートを印字</strong>。</li>
+    <li><strong>オレンジ C：</strong>荷卸し後「タンク管理表」の計算在庫。</li>
+    <li><strong>ピンク D：</strong>荷卸し後「在庫レシート」の実在庫。</li>
+    <li><strong>紫 ④：</strong>荷卸し後タンク管理表の今回入荷数量（実数を確認）。入荷なしは「0」。</li>
+    <li>「紙へ転記」で誤差と判定を確認し、正式な紙に手書きで記入。</li>
+   </ol>
+   <div class="info">タンク管理表・レシートでは灯油が<strong>4行目</strong>ですが、正式なチェック表では<strong>10番 K（20KL）</strong>です。4〜9番のタンク欄は空欄のままです。</div>
+   <h3>自動計算の仕組み</h3>
+   <p>①＝B−A、②＝D−C、③＝②−①、誤差率＝③÷④×100</p>
+   <p>H・R・D：誤差量が<strong>±400L以上</strong>または誤差率が<strong>±2.5%以上</strong>で×。K：誤差量が<strong>±100L以上</strong>または誤差率が<strong>±2.5%以上</strong>で×。</p>
+   <p>④が0Lなら誤差率を表示せず、数量誤差が基準以上のときだけ×です。数字が不足している間は「要入力」と表示します。</p>
+   <div class="warn">このアプリは非公式の計算補助です。コンタミが疑われる場合は該当油種の販売を停止し、上長へ連絡するなど、会社の正式な手順を優先してください。</div>
+   <button type="button" id="newFromGuide" class="secondary danger">新しい荷卸しを始める（数字を消去）</button>
+  </div>
+ </section>
+</main>
+<footer class="footer">数字入力専用／写真の送信・外部AI・利用者登録は不要です</footer>
+<div class="bottom-bar"><button type="button" id="bottomEntry">数字を入力</button><button type="button" id="bottomPaper">計算結果を見る</button></div>
+<script src="./app.js"></script>
+</body>
+</html>

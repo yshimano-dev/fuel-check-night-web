@@ -151,3 +151,13 @@ footer{text-align:center;color:#6c8190;margin:23px 0;font-size:12px}.bottom{posi
 .quick-code #quickSaveCode{display:block;width:100%;margin-top:10px;background:#17618a;color:white}
 #staffMethodStep{color:#195a76;font-size:16px;font-weight:800;margin:8px 0}
 #stepEditStaffMethod{font-size:12px;padding:7px 10px}
+
+/* Discreet trial-release identification at the bottom of the workflow. */
+.release-meta{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:9px auto 0;font-size:11px;color:#8495a1}
+.release-meta #releaseVersion{white-space:nowrap;font-variant-numeric:tabular-nums}
+.release-history{position:relative;max-width:100%}
+.release-history summary{display:inline;cursor:pointer;color:#8495a1;text-decoration:underline;text-underline-offset:2px}
+.release-history[open]{flex-basis:100%;text-align:left;padding:8px 12px;border:1px solid #dce6ed;border-radius:8px;background:#f8fbfd;color:#657987}
+.release-history[open] summary{display:list-item;margin-left:15px}
+.release-history ol{margin:7px 0 0;padding-left:23px}
+.release-history li{margin:4px 0;line-height:1.6}

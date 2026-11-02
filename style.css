@@ -142,3 +142,12 @@ footer{text-align:center;color:#6c8190;margin:23px 0;font-size:12px}.bottom{posi
 
 .pos-repeat-tip{background:#eaf5f2;border-left:4px solid #2a8b73;border-radius:7px;padding:9px 11px;color:#245a4c;font-size:13px;margin:7px 0 12px;line-height:1.6}
 .pos-repeat-tip[hidden]{display:none}
+
+/* Staff assignment differs by POS/store: numeric code or named button. */
+.quick-code #quickCodeEditor select{width:100%;height:44px;margin:7px 0;border:1px solid #90b5cb;border-radius:8px;padding:7px 9px;background:#fff;color:#193950}
+.quick-code #quickCodeEditor>div>label{display:block;margin:11px 0 5px}
+.quick-code #quickCodeInput,.quick-code #quickStaffButtonInput{display:block;width:100%;height:46px;font-size:18px;font-weight:700;border:1px solid #90b5cb;border-radius:8px;padding:7px 10px;background:white;color:#193950}
+.quick-code #quickStaffButtonRow[hidden],.quick-code #quickCodeRow[hidden]{display:none}
+.quick-code #quickSaveCode{display:block;width:100%;margin-top:10px;background:#17618a;color:white}
+#staffMethodStep{color:#195a76;font-size:16px;font-weight:800;margin:8px 0}
+#stepEditStaffMethod{font-size:12px;padding:7px 10px}

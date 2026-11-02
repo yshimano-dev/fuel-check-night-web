@@ -52,7 +52,7 @@ function energisInbound(store,code){
  const no=esc(store.posCardNo?store.posCardNo+'番':'未設定');
  return step('1','通常 → 入出荷業務 → 入庫',posScreen('メインメニュー','入出荷業務',['通常','入出荷業務','入庫','戻る']),'入庫の画面を開きます。')+
  '<div class="visual-step"><strong>2．転受カード一覧で選択</strong><div class="mock-screen"><div class="mock-top"><span>入庫</span><span>転受カード一覧</span></div><div class="mock-form-line">カード名称：<b>'+name+'</b></div><div class="mock-form-line emphasis">選択番号：<b>'+no+'</b></div><div class="mock-form-line">次の画面：店受けカード一覧</div></div><p>カードの名称と番号は店舗によって異なります。</p></div>'+
- '<div class="visual-step"><strong>3．担当者コードとタンク・数量の入力</strong><div class="mock-screen"><div class="mock-top"><span>入庫</span><span>店受けカード一覧</span></div><div class="mock-form-line emphasis">担当者コード：<b>'+esc(code||'この端末で登録')+'</b></div><div class="mock-form-line">商品パネル → 油種選択</div><div class="mock-form-line">タンクNo. → 数量入力</div></div><p>入庫数量を伝票と照合してください。別のタンク・油種がある場合は［商品パネル］に戻り、油種 → タンクNo. → 数量の入力を繰り返してください。</p></div>';
+ '<div class="visual-step"><strong>3．担当者の指定とタンク・数量の入力</strong><div class="mock-screen"><div class="mock-top"><span>入庫</span><span>店受けカード一覧</span></div><div class="mock-form-line emphasis"><b>'+esc(typeof staffGuide==='function'?staffGuide(store.id):('担当者コード：'+(code||'未登録')))+'</b></div><div class="mock-form-line">商品パネル → 油種選択</div><div class="mock-form-line">タンクNo. → 数量入力</div></div><p>入庫数量を伝票と照合してください。別のタンク・油種がある場合は［商品パネル］に戻り、油種 → タンクNo. → 数量の入力を繰り返してください。</p></div>';
 }
 function pos21Inbound(){
  return '<p class="visual-warning">ご提供の「POS21：燃料入庫（仕入）処理」の写真（3〜6枚目）に基づく再現図です。店舗によって実機の画面配置や操作権限は異なります。</p>'+

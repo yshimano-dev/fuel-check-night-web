@@ -1,6 +1,7 @@
 'use strict';
 const STORAGE='fuel-check-workflow-v1';
 const STAFF_LOCAL_KEY='fuel-check-local-staff-v1';
+const STAFF_METHOD_KEY='fuel-check-local-staff-method-v1';
 const FUELS=[['H','H｜ハイオク'],['R','R｜レギュラー'],['D','D｜軽油'],['K','K｜灯油'],['OTHER','その他／廃油など']];
 const DEFAULT_CHECKS={preReceipt:false,prePos:false,unloading:false,postReceipt:false,posEntered:false,postPos:false,paperSaved:false};
 const FIELDS=['A','B','C','D','Q'];
@@ -139,6 +140,36 @@ function writeStaffCode(storeId,raw){
   return true;
  }catch(e){return false}
 }
+function readStaffChoice(storeId){
+ try{
+  const all=JSON.parse(localStorage.getItem(STAFF_METHOD_KEY)||'{}'),raw=all?.[storeId];
+  if(raw?.type==='button'&&typeof raw.label==='string'&&raw.label.trim())return {type:'button',label:raw.label.trim().slice(0,30)};
+ }catch(e){}
+ // 旧版で登録した伊都店の「99」は従来どおりコード入力方式として使える。
+ return {type:'code',label:''};
+}
+function writeStaffChoice(storeId,choice){
+ try{
+  const all=JSON.parse(localStorage.getItem(STAFF_METHOD_KEY)||'{}');
+  all[storeId]={type:choice.type==='button'?'button':'code',label:choice.type==='button'?choice.label:''};
+  localStorage.setItem(STAFF_METHOD_KEY,JSON.stringify(all));
+  return true;
+ }catch(e){return false;}
+}
+function staffShort(storeId){
+ const choice=readStaffChoice(storeId);
+ return choice.type==='button'?'担当者 →「'+choice.label+'」を選択':'担当者コード '+(readStaffCode(storeId)||'未登録');
+}
+function staffGuide(storeId){
+ const choice=readStaffChoice(storeId);
+ return choice.type==='button'?'担当者ボタン →「'+choice.label+'」を選択（コード入力なし）':
+  '担当者コード：'+(readStaffCode(storeId)||'未登録（上部で設定）');
+}
+function syncQuickStaffMode(){
+ const isButton=el('quickStaffMode').value==='button';
+ el('quickCodeRow').hidden=isButton;
+ el('quickStaffButtonRow').hidden=!isButton;
+}
 function flowRow(id,heading,items){
  const root=el(id);root.replaceChildren();
  root.append(make('h3','',heading));
@@ -173,21 +204,27 @@ function saveQuickCard(){
  el('quickCardEditor').hidden=true;
 }
 function openQuickCodeEditor(){
- const editor=el('quickCodeEditor');
+ const st=activeStore(),choice=readStaffChoice(st.id),editor=el('quickCodeEditor');
  editor.hidden=false;
- el('quickCodeInput').value=readStaffCode(activeStore().id);
+ el('quickStaffMode').value=choice.type;
+ el('quickCodeInput').value=readStaffCode(st.id);
+ el('quickStaffButtonInput').value=choice.label||'';
+ syncQuickStaffMode();
  editor.scrollIntoView({behavior:'smooth',block:'center'});
- el('quickCodeInput').focus({preventScroll:true});
+ (choice.type==='button'?el('quickStaffButtonInput'):el('quickCodeInput')).focus({preventScroll:true});
 }
 function saveQuickCode(){
- const st=activeStore(),raw=el('quickCodeInput').value;
- if(raw.trim()&&!/^\d{1,12}$/.test(raw.trim())){
-  alert('担当者コードは12桁以内の数字で入力してください。');
-  return;
- }
- if(!writeStaffCode(st.id,raw.trim())){
-  alert('この端末に保存できませんでした。Safariの保存設定を確認してください。');
-  return;
+ const st=activeStore(),type=el('quickStaffMode').value;
+ if(type==='button'){
+  const label=el('quickStaffButtonInput').value.trim();
+  if(!label||label.length>30){alert('POS画面で選ぶ担当者ボタンの名前を30文字以内で入力してください。');return;}
+  if(!writeStaffChoice(st.id,{type:'button',label})){alert('この端末に保存できませんでした。');return;}
+ }else{
+  const raw=el('quickCodeInput').value.trim();
+  if(raw&&!/^\d{1,12}$/.test(raw)){alert('担当者コードは12桁以内の数字で入力してください。');return;}
+  if(!writeStaffCode(st.id,raw)||!writeStaffChoice(st.id,{type:'code',label:''})){
+   alert('この端末に保存できませんでした。Safariの保存設定を確認してください。');return;
+  }
  }
  el('quickCodeEditor').hidden=true;
  renderPos();renderQuickFlow();
@@ -211,7 +248,7 @@ function renderQuickFlow(){
    {label:'カード名称 '+name,href:'#quickCardEditor'},
    {label:no+'（タップして変更）',href:'#quickCardEditor',important:true},
    {label:'店受けカード一覧',href:'#step6'},
-   {label:'担当者コード '+(code||'未登録'),href:'#quickCodeEditor',important:true},
+   {label:staffShort(st.id),href:'#quickCodeEditor',important:true},
    {label:'油種・タンクNo.・数量（必要な分だけ繰り返す）→後POS印刷',href:'#step6'},
    {label:'C・D・④入力 → 判定',href:'#step7'}
   ]);
@@ -220,7 +257,7 @@ function renderQuickFlow(){
    {label:'レシート再印字',href:'#step5',important:true},
    {label:'POS21 → 仕入',href:'#step6'},
    {label:'油種・タンクNo.・数量',href:'#step6'},
-   {label:'担当者コード '+(code||'未登録'),href:'#quickCodeEditor'},
+   {label:staffShort(st.id),href:'#quickCodeEditor'},
    {label:'後POS印刷 → C・D・④入力',href:'#step7'},
    {label:'判定',href:'#step8'}
   ]);
@@ -232,12 +269,14 @@ function renderQuickFlow(){
  el('quickCardName').value=st.posCardName||'';
  el('quickCardNo').value=st.posCardNo||'';
  el('quickCardEditor').hidden=true;
- el('quickCodeValue').textContent=code||'未登録（初回のみ設定）';
+ el('quickCodeValue').textContent=staffShort(st.id);
  const edit=el('quickCodeEditor');edit.hidden=true;
  el('quickCodeInput').value=code;
- const field=el('staffCode');
- if(field){field.value=code;field.type='text';field.readOnly=true;}
- const toggle=el('toggleStaffCode');if(toggle)toggle.textContent='変更';
+ const choice=readStaffChoice(st.id);
+ el('quickStaffMode').value=choice.type;
+ el('quickStaffButtonInput').value=choice.label||'';
+ syncQuickStaffMode();
+
 }
 function renderPos(){
  const store=activeStore(),pos=store.pos;
@@ -248,7 +287,7 @@ function renderPos(){
  const post=pos==='ENERIS'?[
  'メインメニュー','通常','入出荷業務','入庫','転受カード一覧',
  'カード名称：'+chosenName,'一覧の選択番号：'+chosenNo,
- '店受けカード一覧','担当者コード：'+(readStaffCode(store.id)||'未登録（上部の店舗フローで設定）'),'商品パネル','油種選択','タンクNo.','数量','単価は削除・金額は未入力'
+ '店受けカード一覧',staffGuide(store.id),'商品パネル','油種選択','タンクNo.','数量','単価は削除・金額は未入力'
  ]:[
  'メインメニュー','伝票入力','仕入','仕入先選択',
  'エネオス','確定（2回）','タンクNo.と数量のみ入力','油種選択（必要なら繰り返す）'
@@ -261,15 +300,13 @@ function renderPos(){
  const hint=el('posSelectionHint');
  hint.textContent=pos==='ENERIS'?
  ('この店舗で選ぶカード：'+chosenName+'／選択番号：'+chosenNo+
-  '。担当者コードは下欄に入力（共有リンクには含まれません）。'):
+  '。担当者の指定方法は店舗別に設定（共有リンクには含まれません）。'):
  'POS21用の操作案内です。カード選択や担当者コードは店舗の正式設定を確認してください。';
  hint.classList.toggle('needs-config',pos==='ENERIS'&&(!store.posCardName||!store.posCardNo));
  el('posNote').textContent=pos==='ENERIS'?
  'ENEOSの2026年10月15日版マニュアル16〜21ページの画面順を参考にしています。入庫カードの名称・番号は店舗ごとに異なるため、事前に店舗設定で登録してください。別のタンク・油種も入荷する場合は、商品パネルに戻ってタンクごとに油種・タンクNo.・数量の入力を繰り返します。':
  'ENEOSの2026年10月15日版マニュアル4〜9ページの画面順を参考にしています。スタッフコードの入力や仕入先の選択は店舗の正式な手順を確認してください。';
- const code=el('staffCode');
- if(code){code.value=readStaffCode(store.id);code.type='text';code.readOnly=true;}
- const toggle=el('toggleStaffCode');if(toggle)toggle.textContent='変更';
+ const step=el('staffMethodStep');if(step)step.textContent=staffGuide(store.id);
 }
 function renderPath(id,steps){
  const root=el(id);root.replaceChildren();
@@ -407,8 +444,10 @@ function init(){
   else el('quickCodeEditor').hidden=true;
  });
  el('quickSaveCode').addEventListener('click',saveQuickCode);
+ el('quickStaffMode').addEventListener('change',syncQuickStaffMode);
+ el('quickStaffButtonInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveQuickCode();}});
+ el('stepEditStaffMethod').addEventListener('click',openQuickCodeEditor);
  el('quickCodeInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveQuickCode();}});
- el('toggleStaffCode').addEventListener('click',openQuickCodeEditor);
  el('newJob').addEventListener('click',startNewJob);
  el('clearDigits').addEventListener('click',clearActiveJob);
  el('goTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));

@@ -24,3 +24,15 @@ test('approved store records are immutable in source and local cards remain edit
  assert.match(html,/id="quickEditCard"/);
  assert.match(html,/id="clearDigits"/);
 });
+
+test('central registry holds only manager fields; card and staff settings stay local',()=>{
+ const win={};vm.runInNewContext(code,{window:win});
+ for(const st of win.FUEL_APPROVED_STORES){
+  for(const field of ['pos','posCardName','posCardNo','staffCode','staffMethod'])assert.ok(!(field in st),field);
+  assert.ok(st.name&&st.id&&Array.isArray(st.tanks));
+  assert.ok(st.tanks.every(t=>Number.isInteger(t.no)&&t.capacity&&t.oil));
+ }
+ assert.match(app,/STAFF_LOCAL_KEY/);
+ assert.match(app,/STAFF_METHOD_KEY/);
+ assert.match(app,/state\.cardOverrides/);
+});

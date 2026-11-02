@@ -232,7 +232,7 @@ function saveQuickCode(){
 function renderQuickFlow(){
  const st=activeStore(),pos=st.pos,code=readStaffCode(st.id);
  el('quickStoreName').textContent=st.name;
- el('quickPosType').textContent=(pos==='ENERIS'?'ENERIS-POS':'POS21')+' ／ POS操作フローと入庫の順番';
+ el('quickPosType').textContent=(pos==='ENERIS'?'ENEOS POS':'POS21')+' ／ 操作フローと入庫の順番';
  flowRow('quickBefore','① 受け入れ前',[
   {label:'到着したらレシート印字',href:'#step1',important:true},
   {label:'前POS タンク管理表',href:'#step2'},
@@ -280,8 +280,8 @@ function renderQuickFlow(){
 }
 function renderPos(){
  const store=activeStore(),pos=store.pos;
- const chosenName=store.posCardName||'未設定（店舗設定で登録）';
- const chosenNo=store.posCardNo?store.posCardNo+'番':'未設定（店舗設定で登録）';
+ const chosenName=store.posCardName||'未設定（上のカード設定で登録）';
+ const chosenNo=store.posCardNo?store.posCardNo+'番':'未設定（上のカード設定で登録）';
  const pre=pos==='ENERIS'?['メインメニュー','点検','SS営業日報管理','タンク管理表','当日分','印刷']:
  ['メインメニュー','点検／問合せ','タンク管理','印刷','レシート出力'];
  const post=pos==='ENERIS'?[
@@ -292,7 +292,7 @@ function renderPos(){
  'メインメニュー','伝票入力','仕入','仕入先選択',
  'エネオス','確定（2回）','タンクNo.と数量のみ入力','油種選択（必要なら繰り返す）'
  ];
- el('prePosTitle').textContent=pos==='ENERIS'?'ENERIS-POS：荷卸し前のタンク管理表':'POS21：荷卸し前のタンク管理表';
+ el('prePosTitle').textContent=pos==='ENERIS'?'ENEOS POS：荷卸し前のタンク管理表':'POS21：荷卸し前のタンク管理表';
  renderPath('prePosPath',pre);
  renderPath('postPosPath',post);
  const repeat=el('posRepeatTip');if(repeat){repeat.hidden=pos!=='ENERIS';}
@@ -304,7 +304,7 @@ function renderPos(){
  'POS21用の操作案内です。カード選択や担当者コードは店舗の正式設定を確認してください。';
  hint.classList.toggle('needs-config',pos==='ENERIS'&&(!store.posCardName||!store.posCardNo));
  el('posNote').textContent=pos==='ENERIS'?
- 'ENEOSの2026年10月15日版マニュアル16〜21ページの画面順を参考にしています。入庫カードの名称・番号は店舗ごとに異なるため、事前に店舗設定で登録してください。別のタンク・油種も入荷する場合は、商品パネルに戻ってタンクごとに油種・タンクNo.・数量の入力を繰り返します。':
+ 'ENEOSの2026年10月15日版マニュアル16〜21ページの画面順を参考にしています。入庫カードの名称・番号は、店舗を選んだ後に「カードを変更・登録」から設定してください。一度保存すれば次回も自動表示されます。別のタンク・油種も入荷する場合は、商品パネルに戻ってタンクごとに油種・タンクNo.・数量の入力を繰り返します。':
  'ENEOSの2026年10月15日版マニュアル4〜9ページの画面順を参考にしています。スタッフコードの入力や仕入先の選択は店舗の正式な手順を確認してください。';
  const step=el('staffMethodStep');if(step)step.textContent=staffGuide(store.id);
 }

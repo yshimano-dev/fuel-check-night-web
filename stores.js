@@ -5,9 +5,6 @@
    {
      id:"ito",
      name:"DDセルフ伊都店",
-     pos:"ENERIS",
-     posCardName:"入庫（JX日光）",
-     posCardNo:"2",
      tanks:[
        {no:1,capacity:"14KL",oil:"H"},
        {no:2,capacity:"48KL",oil:"R"},

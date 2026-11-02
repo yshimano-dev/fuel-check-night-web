@@ -212,7 +212,7 @@ function renderQuickFlow(){
    {label:no+'（タップして変更）',href:'#quickCardEditor',important:true},
    {label:'店受けカード一覧',href:'#step6'},
    {label:'担当者コード '+(code||'未登録'),href:'#quickCodeEditor',important:true},
-   {label:'油種・数量 → 後POS印刷',href:'#step6'},
+   {label:'油種・タンクNo.・数量（必要な分だけ繰り返す）→後POS印刷',href:'#step6'},
    {label:'C・D・④入力 → 判定',href:'#step7'}
   ]);
  }else{
@@ -256,6 +256,7 @@ function renderPos(){
  el('prePosTitle').textContent=pos==='ENERIS'?'ENERIS-POS：荷卸し前のタンク管理表':'POS21：荷卸し前のタンク管理表';
  renderPath('prePosPath',pre);
  renderPath('postPosPath',post);
+ const repeat=el('posRepeatTip');if(repeat){repeat.hidden=pos!=='ENERIS';}
  renderPath('postReportPath',pre);
  const hint=el('posSelectionHint');
  hint.textContent=pos==='ENERIS'?
@@ -264,7 +265,7 @@ function renderPos(){
  'POS21用の操作案内です。カード選択や担当者コードは店舗の正式設定を確認してください。';
  hint.classList.toggle('needs-config',pos==='ENERIS'&&(!store.posCardName||!store.posCardNo));
  el('posNote').textContent=pos==='ENERIS'?
- 'ENEOSの2026年10月15日版マニュアル16〜21ページの画面順を参考にしています。入庫カードの名称・番号は店舗ごとに異なるため、事前に店舗設定で登録してください。複数油種は「商品パネル」から繰り返します。':
+ 'ENEOSの2026年10月15日版マニュアル16〜21ページの画面順を参考にしています。入庫カードの名称・番号は店舗ごとに異なるため、事前に店舗設定で登録してください。別のタンク・油種も入荷する場合は、商品パネルに戻ってタンクごとに油種・タンクNo.・数量の入力を繰り返します。':
  'ENEOSの2026年10月15日版マニュアル4〜9ページの画面順を参考にしています。スタッフコードの入力や仕入先の選択は店舗の正式な手順を確認してください。';
  const code=el('staffCode');
  if(code){code.value=readStaffCode(store.id);code.type='text';code.readOnly=true;}

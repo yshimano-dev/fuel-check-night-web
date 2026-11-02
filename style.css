@@ -139,3 +139,6 @@ footer{text-align:center;color:#6c8190;margin:23px 0;font-size:12px}.bottom{posi
 .visual-alternate>strong{font-size:14px;color:#204c6a}
 .visual-alternate-actions{display:flex;gap:7px;flex-wrap:wrap}
 .visual-alternate-actions button{background:white;color:#18547b;border:1px solid #b0cada;border-radius:8px;padding:9px 11px;font-weight:800;flex:1;min-width:140px;font-size:12px}
+
+.pos-repeat-tip{background:#eaf5f2;border-left:4px solid #2a8b73;border-radius:7px;padding:9px 11px;color:#245a4c;font-size:13px;margin:7px 0 12px;line-height:1.6}
+.pos-repeat-tip[hidden]{display:none}

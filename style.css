@@ -161,3 +161,19 @@ footer{text-align:center;color:#6c8190;margin:23px 0;font-size:12px}.bottom{posi
 .release-history[open] summary{display:list-item;margin-left:15px}
 .release-history ol{margin:7px 0 0;padding-left:23px}
 .release-history li{margin:4px 0;line-height:1.6}
+
+/* Formal paper sets and morning handover. Keep the two document bundles distinct. */
+.receipt-keep-alert{border:2px solid #d55a3a;background:#fff1e9;border-radius:9px;padding:11px 13px;margin:15px 0 8px;color:#8b3529}
+.receipt-keep-alert strong{font-size:15px}
+.receipt-keep-alert p{font-size:14px;margin:6px 0 0}
+.handoff-group{border:1px solid #b9ccd8;border-radius:10px;padding:11px 12px;background:#f7fbfd;margin:13px 0}
+.handoff-group h3{font-size:15px;margin:0 0 8px;color:#235573}
+.handoff-group ol{margin:6px 0 10px;padding-left:22px;font-size:13px;line-height:1.7}
+.handoff-group li{margin:4px 0}
+.handoff-group p{font-size:14px;margin:7px 0}
+.handoff-pos{background:#fffaf0;border-color:#edcf9c}
+.handoff-pos h3{color:#845522}
+.handoff-pos p strong:last-child{color:#a32a21}
+.morning-handoff{padding:12px;border:2px solid #318565;border-radius:10px;background:#eef8f1;margin:14px 0}
+.morning-handoff>strong{color:#236348;font-size:16px}
+.morning-handoff p{font-size:14px;margin:8px 0}

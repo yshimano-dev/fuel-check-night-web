@@ -14,11 +14,13 @@ test('POS receipt warning and original official 3-page bundle are separately doc
  assert.match(html,/POS入庫処理：別の2点セット/);
  assert.match(html,/朝の担当者への引継ぎ/);
 });
-test('both preservation checks and morning handover are persisted and cleared on next job',()=>{
- for(const field of ['posReceiptSaved','morningHandoff','paperSaved']){
+test('preservation checks stay in the app, but morning handover needs no check',()=>{
+ for(const field of ['posReceiptSaved','paperSaved']){
   assert.ok(app.includes(field),'missing saved field '+field);
   assert.ok(html.includes('data-check="'+field+'"'),'missing control '+field);
  }
+ assert.doesNotMatch(app,/morningHandoff/);
+ assert.doesNotMatch(html,/data-check="morningHandoff"/);
  assert.match(app,/session\(\)\.checks\[c\.dataset\.check\]=c\.checked;save\(\);renderChecks\(\)/);
  assert.match(app,/state\.sessions\[state\.active\]=blankSession\(\)/);
 });

@@ -3,7 +3,7 @@ const STORAGE='fuel-check-workflow-v1';
 const STAFF_LOCAL_KEY='fuel-check-local-staff-v1';
 const STAFF_METHOD_KEY='fuel-check-local-staff-method-v1';
 const FUELS=[['H','H｜ハイオク'],['R','R｜レギュラー'],['D','D｜軽油'],['K','K｜灯油'],['OTHER','その他／廃油など']];
-const DEFAULT_CHECKS={preReceipt:false,prePos:false,unloading:false,postReceipt:false,posEntered:false,postPos:false,paperSaved:false,posReceiptSaved:false,morningHandoff:false};
+const DEFAULT_CHECKS={preReceipt:false,prePos:false,unloading:false,postReceipt:false,posEntered:false,postPos:false,paperSaved:false,posReceiptSaved:false};
 const FIELDS=['A','B','C','D','Q'];
 function fuelLimit(oil){return oil==='K'?{liters:100,percent:2.5}:['H','R','D'].includes(oil)?{liters:400,percent:2.5}:null;}
 function ito(){return {id:'ito',name:'DDセルフ伊都店',pos:'ENERIS',posCardName:'入庫（JX日光）',posCardNo:'2',tanks:[
@@ -402,7 +402,7 @@ function renderResults(){
  }
 }
 function updateProgress(){
- const flags=['preReceipt','prePos','unloading','postReceipt','posEntered','postPos','paperSaved','posReceiptSaved','morningHandoff'];
+ const flags=['preReceipt','prePos','unloading','postReceipt','posEntered','postPos','paperSaved','posReceiptSaved'];
  const n=flags.filter(x=>Boolean(session().checks[x])).length;
  const data=activeStore().tanks.reduce((sum,t)=>sum+FIELDS.filter(f=>getEntry(t)[f]!=='').length,0);
  const complete=n+(data===activeStore().tanks.length*5?2:data>0?1:0);
